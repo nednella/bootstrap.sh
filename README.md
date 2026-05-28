@@ -16,10 +16,10 @@ This installs Homebrew (if missing), clones this repo to `~/.bootstrap.sh/`, and
 
 ```sh
 bootstrap             # run all jobs (install, dotfiles, macos)
-bootstrap install     # Homebrew + Brewfile only
-bootstrap dotfiles    # symlink dotfiles only
-bootstrap macos       # apply macOS preferences only
-bootstrap update      # update binary + pull latest content (stash-safe)
+bootstrap install     # install packages from Brewfile
+bootstrap dotfiles    # symlink dotfiles into $HOME / XDG
+bootstrap macos       # apply macOS preferences
+bootstrap update      # update binary + pull latest content
 ```
 
 Preview without making changes:
