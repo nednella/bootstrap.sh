@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -20,4 +21,36 @@ func Command(name string, args ...string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
+}
+
+func Symlink(src, dst string) error {
+	if DryRun {
+		ui.Dry(fmt.Sprintf("ln -s %s %s", src, dst))
+		return nil
+	}
+	return os.Symlink(src, dst)
+}
+
+func Remove(path string) error {
+	if DryRun {
+		ui.Dry("rm " + path)
+		return nil
+	}
+	return os.Remove(path)
+}
+
+func MkdirAll(path string, perm os.FileMode) error {
+	if DryRun {
+		ui.Dry("mkdir -p " + path)
+		return nil
+	}
+	return os.MkdirAll(path, perm)
+}
+
+func Rename(oldpath, newpath string) error {
+	if DryRun {
+		ui.Dry(fmt.Sprintf("mv %s %s", oldpath, newpath))
+		return nil
+	}
+	return os.Rename(oldpath, newpath)
 }
