@@ -1,0 +1,3 @@
+install_path: ~/.bootstrap.sh
+backup_path: ~/.dotfiles-backup
+repo_url: https://github.com/nednella/bootstrap.sh
