@@ -7,8 +7,9 @@ import (
 )
 
 var installCmd = &cobra.Command{
-	Use:   "install",
-	Short: "Install packages from Brewfile",
+	Use:     "install",
+	Short:   "Install packages from Brewfile",
+	GroupID: jobsGroupID,
 	Run: func(cmd *cobra.Command, args []string) {
 		ui.Header("install")
 		err := jobs.Install()

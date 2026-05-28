@@ -8,8 +8,9 @@ import (
 )
 
 var macosCmd = &cobra.Command{
-	Use:   "macos",
-	Short: "Apply macOS preferences",
+	Use:     "macos",
+	Short:   "Apply macOS preferences",
+	GroupID: jobsGroupID,
 	Run: func(cmd *cobra.Command, args []string) {
 		ui.Header("macos")
 		fmt.Println("macos: not implemented")

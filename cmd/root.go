@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const jobsGroupID = "jobs"
+
 var dryRun bool
 
 var rootCmd = &cobra.Command{
@@ -28,6 +30,10 @@ func Execute() error {
 }
 
 func init() {
+	rootCmd.AddGroup(&cobra.Group{
+		ID:    jobsGroupID,
+		Title: "Job Commands",
+	})
 	rootCmd.PersistentFlags().BoolVarP(
 		&dryRun, "dry-run", "d", false,
 		"preview actions without executing them",
