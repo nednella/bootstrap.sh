@@ -33,8 +33,8 @@ Re-running install.sh is safe: brew is skipped if installed, the clone is skippe
 
 After `install.sh`, the clone exists and the binary is on `$PATH`. Subcommands operate against the clone:
 
-- `bootstrap install` — defensive check that Homebrew is installed (installs it if missing), then runs `brew bundle` against `<install_path>/Brewfile`.
-- `bootstrap dotfiles` — backs up any existing `$HOME` dotfiles to `~/.dotfiles-backup/<timestamp>/`, then walks `<install_path>/dotfiles/` and symlinks per the convention below.
+- `bootstrap install` — runs `brew bundle` against `<install_path>/Brewfile`. Defensively installs Homebrew first if somehow missing.
+- `bootstrap dotfiles` — symlinks `<install_path>/dotfiles/` into `$HOME` and `$XDG_CONFIG_HOME` per the convention below. Existing files get backed up to `~/.dotfiles-backup/<timestamp>/` first.
 - `bootstrap macos` — runs the macOS settings job.
 
 ### Update flow
@@ -86,10 +86,10 @@ No metadata files needed — the dot prefix carries the intent.
 
 ```
 bootstrap                 # run all jobs in order (install, dotfiles, macos)
-bootstrap install         # Homebrew + Brewfile only
-bootstrap dotfiles        # backup existing + symlink into $HOME / XDG
-bootstrap macos           # apply macOS preferences only
-bootstrap update          # update binary + pull latest content (stash-safe)
+bootstrap install         # install packages from Brewfile
+bootstrap dotfiles        # symlink dotfiles into $HOME / XDG
+bootstrap macos           # apply macOS preferences
+bootstrap update          # update binary + pull latest content
 
 --dry-run                 # global flag; print what would happen, change nothing
 ```
@@ -154,6 +154,10 @@ Prefix style vars with the feature that consumes them: `headerArrowStyle`, not `
 
 "and" / "&" in a commit subject means the commit should be split into multiple commits. One logical change per commit. Subject-only — no commit body unless genuinely load-bearing.
 
+### Command framing
+
+Describe commands (Cobra `Short`/`Long`, README usage, command-surface lines) by the **primary action**. Prerequisites and defensive checks are implementation detail, not user-facing copy.
+
 ---
 
 ## Milestones
@@ -162,10 +166,10 @@ Prefix style vars with the feature that consumes them: `headerArrowStyle`, not `
 - [ ] **M2** — `internal/config`: embedded YAML loader (`go:embed default_config.yaml`)
 - [ ] **M3** — `internal/ui`: styled output, status messages, prompts
 - [ ] **M4** — dry-run plumbing: shell-out runner that honours `--dry-run`; everything destructive routes through it
-- [ ] **M5** — `install` job: defensive Homebrew install + `brew bundle` against clone's Brewfile
-- [ ] **M6** — `dotfiles` job: backup existing → walk `dotfiles/<program>/` → symlink per convention
+- [ ] **M5** — `install` job: `brew bundle` against clone's Brewfile (defensive Homebrew install first)
+- [ ] **M6** — `dotfiles` job: walk `dotfiles/<program>/`, symlink per convention; back up existing first
 - [ ] **M7** — `macos` job: macOS settings
-- [ ] **M8** — `update` job: download newer release binary if available + stash-aware `git pull` on clone
+- [ ] **M8** — `update` job: download newer release binary if available; stash-aware `git pull` on clone
 - [ ] **M9** — `install.sh` (the curl one-liner): idempotent Homebrew install + clone repo + binary download + PATH placement
 - [ ] **M10** — GitHub Actions release workflow: cross-compile arm64 + amd64, attach to release
 - [ ] **M11** — README polish, optional Homebrew tap (`brew install nednella/tap/bootstrap.sh`)
