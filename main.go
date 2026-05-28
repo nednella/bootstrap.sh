@@ -1,7 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"os"
+
+	"github.com/nednella/bootstrap.sh/cmd"
+)
 
 func main() {
-	fmt.Println("hello, world")
+	err := cmd.Execute()
+	if err != nil {
+		os.Exit(1)
+	}
 }
