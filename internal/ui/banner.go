@@ -18,10 +18,10 @@ const bannerArt = `     _                 _       _                        _
 const rule = "════════════════════════════════════════════════════════════════════════════════════════════════════"
 
 var (
-	ruleStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).MarginTop(1).MarginBottom(1) // dim grey, blank above and below — shared for all rules
+	ruleStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).MarginTop(1).MarginBottom(1) // dim grey
 
-	bannerArtStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("14")).Bold(true)              // bright cyan
-	bannerCreditStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).MarginLeft(50)           // sits under the art's right edge
+	bannerArtStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("14")).Bold(true) // bright
+	bannerCreditStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).MarginLeft(50)
 	bannerTaglineStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).MarginLeft(4).MarginTop(1)
 
 	farewellBoldStyle = lipgloss.NewStyle().Bold(true)

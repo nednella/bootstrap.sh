@@ -154,6 +154,10 @@ A function called by a neighbouring function — a helper in a local call chain 
 
 Standard Go: exported identifiers `PascalCase`, unexported `camelCase`, initialisms all-caps (`URL`, `ID`, `HTTP`). Never export a helper purely so another package can reach it — that breaks the casing consistency of its sibling helpers. Route the cross-package call through the package's public entry point instead.
 
+### Comments
+
+Code should be self-descriptive — comments should not be needed. Don't write doc or inline comments; reach for clearer names instead. Compiler directives (`//go:embed`) are not comments and stay.
+
 ### Style var naming
 
 Prefix style vars with the feature that consumes them: `headerArrowStyle`, not `arrowStyle`.

@@ -14,8 +14,8 @@ var (
 	infoStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("12")).MarginLeft(2).Width(8) // bright blue
 	successStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("10")).MarginLeft(2).Width(8) // bright green
 	warnStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("11")).MarginLeft(2).Width(8) // bright yellow
-	errorStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("9")).MarginLeft(2).Width(8)  // bright red
-	dryStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).MarginLeft(2).Width(8)  // grey
+	errorStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("9")).MarginLeft(2).Width(8) // bright red
+	dryStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).MarginLeft(2).Width(8) // grey
 	dryBodyStyle = lipgloss.NewStyle().Faint(true)
 )
 

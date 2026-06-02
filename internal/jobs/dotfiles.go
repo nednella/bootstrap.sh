@@ -46,8 +46,6 @@ func Dotfiles() error {
 	return nil
 }
 
-// linkProgram symlinks each top-level entry in dotfiles/<program>/ to its
-// destination per the dot-prefix convention.
 func linkProgram(programDir, programName, backupDir string) error {
 	entries, err := os.ReadDir(programDir)
 	if err != nil {
@@ -65,7 +63,7 @@ func linkProgram(programDir, programName, backupDir string) error {
 	return nil
 }
 
-// resolveTarget applies the convention: dot-prefixed → $HOME, else → $XDG/<program>/.
+// resolveTarget applies the convention: dot-prefix → $HOME, else → $XDG_CONFIG_HOME/<program>/
 func resolveTarget(filename, programName string) string {
 	if strings.HasPrefix(filename, ".") {
 		return filepath.Join(utils.Home, filename)
@@ -73,9 +71,6 @@ func resolveTarget(filename, programName string) string {
 	return filepath.Join(utils.ConfigDir, programName, filename)
 }
 
-// link routes target to the right action based on what's currently at that path.
-// Ordered from most permissive (nothing there) to most defensive (a real file we
-// must preserve before overwriting).
 func link(src, target, backupDir string) error {
 	name := utils.DisplayName(target)
 
