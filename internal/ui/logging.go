@@ -19,6 +19,19 @@ var (
 	dryBodyStyle = lipgloss.NewStyle().Faint(true)
 )
 
+func Die(msg string) {
+	Error(msg)
+	os.Exit(1)
+}
+
+func Dry(msg string) {
+	fmt.Println(dryStyle.Render("dry") + dryBodyStyle.Render(msg))
+}
+
+func Error(msg string) {
+	fmt.Fprintln(os.Stderr, errorStyle.Render("error")+msg)
+}
+
 func Header(title string) {
 	line := headerArrowStyle.Render("==> ") + headerTitleStyle.Render(title)
 	fmt.Println(headerStyle.Render(line))
@@ -34,17 +47,4 @@ func Success(msg string) {
 
 func Warn(msg string) {
 	fmt.Println(warnStyle.Render("warn") + msg)
-}
-
-func Error(msg string) {
-	fmt.Fprintln(os.Stderr, errorStyle.Render("error")+msg)
-}
-
-func Dry(msg string) {
-	fmt.Println(dryStyle.Render("dry") + dryBodyStyle.Render(msg))
-}
-
-func Die(msg string) {
-	Error(msg)
-	os.Exit(1)
 }

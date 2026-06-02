@@ -23,12 +23,12 @@ func Command(name string, args ...string) error {
 	return cmd.Run()
 }
 
-func Symlink(src, dst string) error {
+func MkdirAll(path string, perm os.FileMode) error {
 	if DryRun {
-		ui.Dry(fmt.Sprintf("ln -s %s %s", src, dst))
+		ui.Dry("mkdir -p " + path)
 		return nil
 	}
-	return os.Symlink(src, dst)
+	return os.MkdirAll(path, perm)
 }
 
 func Remove(path string) error {
@@ -39,18 +39,18 @@ func Remove(path string) error {
 	return os.Remove(path)
 }
 
-func MkdirAll(path string, perm os.FileMode) error {
-	if DryRun {
-		ui.Dry("mkdir -p " + path)
-		return nil
-	}
-	return os.MkdirAll(path, perm)
-}
-
 func Rename(oldpath, newpath string) error {
 	if DryRun {
 		ui.Dry(fmt.Sprintf("mv %s %s", oldpath, newpath))
 		return nil
 	}
 	return os.Rename(oldpath, newpath)
+}
+
+func Symlink(src, dst string) error {
+	if DryRun {
+		ui.Dry(fmt.Sprintf("ln -s %s %s", src, dst))
+		return nil
+	}
+	return os.Symlink(src, dst)
 }
