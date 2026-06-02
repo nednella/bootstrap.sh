@@ -150,6 +150,10 @@ if err != nil {
 
 A function called by a neighbouring function — a helper in a local call chain — sits in execution (reading) order, caller above callee (see `internal/utils/preflight.go`, `internal/jobs/dotfiles.go`). A function only ever called from elsewhere — an independent primitive or entry point — is ordered alphabetically (see `internal/utils/run.go`).
 
+### Casing
+
+Standard Go: exported identifiers `PascalCase`, unexported `camelCase`, initialisms all-caps (`URL`, `ID`, `HTTP`). Never export a helper purely so another package can reach it — that breaks the casing consistency of its sibling helpers. Route the cross-package call through the package's public entry point instead.
+
 ### Style var naming
 
 Prefix style vars with the feature that consumes them: `headerArrowStyle`, not `arrowStyle`.
