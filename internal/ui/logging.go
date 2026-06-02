@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	headerStyle      = lipgloss.NewStyle().MarginBottom(1)
+	headerStyle      = lipgloss.NewStyle().MarginTop(1).MarginBottom(1)
 	headerArrowStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("14")).Bold(true) // bright cyan
 	headerTitleStyle = lipgloss.NewStyle().Bold(true)
 	infoStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("12")).MarginLeft(2).Width(8) // bright blue

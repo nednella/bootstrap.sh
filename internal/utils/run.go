@@ -23,6 +23,15 @@ func Command(name string, args ...string) error {
 	return cmd.Run()
 }
 
+func Lookup(name string) bool {
+	if DryRun {
+		ui.Dry("command -v " + name)
+		return true
+	}
+	_, err := exec.LookPath(name)
+	return err == nil
+}
+
 func MkdirAll(path string, perm os.FileMode) error {
 	if DryRun {
 		ui.Dry("mkdir -p " + path)

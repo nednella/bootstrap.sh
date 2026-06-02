@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/nednella/bootstrap.sh/internal/jobs"
 	"github.com/nednella/bootstrap.sh/internal/ui"
 	"github.com/nednella/bootstrap.sh/internal/utils"
 	"github.com/spf13/cobra"
@@ -20,7 +21,16 @@ Installs Homebrew + Brewfile, symlinks dotfiles into $HOME, and applies macOS pr
 		utils.DryRun = dryRun
 		ui.Banner()
 		if dryRun {
-			ui.Warn("DRY RUN — no changes will be made\n")
+			ui.Warn("DRY RUN — no changes will be made")
+		}
+
+		if cmd.GroupID != jobsGroupID {
+			return
+		}
+
+		err := jobs.Preflight()
+		if err != nil {
+			ui.Die(err.Error())
 		}
 	},
 }
