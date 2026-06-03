@@ -8,7 +8,7 @@ A Go CLI that bootstraps a fresh macOS install: Homebrew + Brewfile, dotfiles, m
 
 Monorepo. This repo contains both the CLI tool's Go source and the dotfiles it manages.
 
-The binary is distributed as a prebuilt artefact via GitHub Releases. `install.sh` clones this repo to a known location on disk (default `~/.bootstrap.sh/`) and drops the binary on `$PATH`. From then on, the binary uses the clone as the live source for symlinks. Edits to symlinked files write through to the clone, so changes can be committed and pushed back upstream — the dev workflow is normal git.
+The binary is distributed as a prebuilt artefact via GitHub Releases. `install.sh` downloads it and drops it on `$PATH` (`/usr/local/bin`). On first run the binary's `preflight` clones this repo to a known location on disk (default `~/.bootstrap.sh/`). From then on, the binary uses the clone as the live source for symlinks. Edits to symlinked files write through to the clone, so changes can be committed and pushed back upstream — the dev workflow is normal git.
 
 The Go source ends up on disk alongside the dotfiles inside the clone. It is unused at runtime (the binary on `$PATH` is already built) — accepted as harmless dead weight in exchange for a single-curl install with no Go required on the user's machine.
 
@@ -20,20 +20,18 @@ User runs:
 curl -fsSL https://raw.githubusercontent.com/nednella/bootstrap.sh/main/install.sh | bash
 ```
 
-`install.sh` (idempotent throughout):
+`install.sh` is **light** — it only:
 
-1. Installs Homebrew if missing (which pulls in `xcode-select`, giving us `git`).
-2. Clones this repo into the install path if absent (default `~/.bootstrap.sh/`).
-3. Downloads the latest prebuilt `bootstrap` binary from GitHub Releases.
-4. Drops it on `$PATH` at `$(brew --prefix)/bin/bootstrap`.
+1. Downloads the latest prebuilt `bootstrap-darwin-arm64` from GitHub Releases (via the `releases/latest/download/` redirect).
+2. Drops it on `$PATH` at `/usr/local/bin/bootstrap` (sudo only if the directory isn't writable).
 
-Re-running install.sh is safe: brew is skipped if installed, the clone is skipped if it exists, the binary is refreshed.
+Homebrew and the repo clone are **not** install.sh's job — `preflight` (run inside the binary before any job) ensures Homebrew → git → repo clone. Re-running install.sh just refreshes the binary.
 
 ### Runtime flow
 
-After `install.sh`, the clone exists and the binary is on `$PATH`. Subcommands operate against the clone:
+After `install.sh`, the binary is on `$PATH`. Every job command runs `preflight` first (ensure Homebrew → git → repo clone), then operates against the clone:
 
-- `bootstrap install` — runs `brew bundle` against `<install_path>/Brewfile`. Defensively installs Homebrew first if somehow missing.
+- `bootstrap install` — runs `brew bundle` against `<install_path>/Brewfile`.
 - `bootstrap dotfiles` — symlinks `<install_path>/dotfiles/` into `$HOME` and `$XDG_CONFIG_HOME` per the convention below. Existing files get backed up to `~/.dotfiles-backup/<timestamp>/` first.
 - `bootstrap macos` — runs the macOS settings job.
 
@@ -41,7 +39,7 @@ After `install.sh`, the clone exists and the binary is on `$PATH`. Subcommands o
 
 `bootstrap update` is a single command that updates both binary and content:
 
-1. Checks GH releases for a newer binary; if newer, downloads and atomically replaces self.
+1. Checks GH releases for a newer binary; if newer, downloads and replaces self at `/usr/local/bin` (sudo).
 2. Stash-aware `git pull` on the clone:
    ```
    git status --short            # any uncommitted changes?
@@ -104,20 +102,21 @@ CLI is built with **Cobra**. `main.go` is thin (wires the root command, defers e
 bootstrap.sh/
 ├── CLAUDE.md           # this file
 ├── README.md           # user-facing docs
-├── install.sh          # the curl one-liner: installs Homebrew + clones repo + downloads binary
+├── install.sh          # the curl one-liner: downloads + installs the prebuilt binary
 ├── Brewfile            # consumed by `bootstrap install` from the clone at runtime
 ├── dotfiles/           # consumed by `bootstrap dotfiles` from the clone at runtime
 │   ├── ghostty/
 │   ├── git/
 │   ├── zsh/
 │   └── ...
+├── .github/workflows/  # release-please (version + release PR) + release-binary (build & attach)
 ├── go.mod
 ├── main.go             # Cobra root + subcommand wiring; thin
 ├── cmd/                # one file per subcommand: parse → call into internal/jobs
 └── internal/
     ├── config/         # embedded YAML + loader
     ├── ui/             # styled output, status messages, prompts
-    ├── jobs/           # one file per job: install, dotfiles, macos, update — actual work
+    ├── jobs/           # one file per job: preflight, install, dotfiles, macos, update — actual work
     └── utils/          # shared primitives added just-in-time (shell-out runner, fs, symlinks)
 ```
 
@@ -148,7 +147,7 @@ if err != nil {
 
 ### Declaration order
 
-A function called by a neighbouring function — a helper in a local call chain — sits in execution (reading) order, caller above callee (see `internal/utils/preflight.go`, `internal/jobs/dotfiles.go`). A function only ever called from elsewhere — an independent primitive or entry point — is ordered alphabetically (see `internal/utils/run.go`).
+A function called by a neighbouring function — a helper in a local call chain — sits in execution (reading) order, caller above callee (see `internal/jobs/preflight.go`, `internal/jobs/dotfiles.go`). A function only ever called from elsewhere — an independent primitive or entry point — is ordered alphabetically (see `internal/utils/os.go`).
 
 ### Casing
 
@@ -174,16 +173,20 @@ Describe commands (Cobra `Short`/`Long`, README usage, command-surface lines) by
 
 ## Milestones
 
-- [ ] **M1** — Cobra CLI skeleton: root command, subcommand dispatch, help text (no job logic yet)
-- [ ] **M2** — `internal/config`: embedded YAML loader (`go:embed default_config.yaml`)
-- [ ] **M3** — `internal/ui`: styled output, status messages, prompts
-- [ ] **M4** — dry-run plumbing: shell-out runner that honours `--dry-run`; everything destructive routes through it
-- [ ] **M5** — `install` job: `brew bundle` against clone's Brewfile (defensive Homebrew install first)
-- [ ] **M6** — `dotfiles` job: walk `dotfiles/<program>/`, symlink per convention; back up existing first
-- [ ] **M7** — `macos` job: macOS settings
-- [ ] **M8** — `update` job: download newer release binary if available; stash-aware `git pull` on clone
-- [ ] **M9** — `install.sh` (the curl one-liner): idempotent Homebrew install + clone repo + binary download + PATH placement
-- [ ] **M10** — GitHub Actions release workflow: cross-compile arm64 + amd64, attach to release
+Remaining milestones are ordered by the planned order of work.
+
+- [x] **M1** — Cobra CLI skeleton: root command, subcommand dispatch, help text (no job logic yet)
+- [x] **M2** — `internal/config`: embedded YAML loader (`go:embed default_config.yaml`)
+- [x] **M3** — `internal/ui`: styled output, status messages, prompts
+- [x] **M4** — dry-run plumbing: shell-out runner that honours `--dry-run`; everything destructive routes through it
+- [x] **M5** — `install` job: `brew bundle` against the clone's Brewfile (Homebrew now ensured by preflight)
+- [x] **M6** — `dotfiles` job: walk `dotfiles/<program>/`, symlink per convention; back up existing first
+- [x] **M7** — `macos` job: macOS settings via `defaults write` (ByHost-aware), then restart affected services
+- [ ] **M8** — `install.sh` (the curl one-liner): download `bootstrap-darwin-arm64` from the latest release and drop it at `/usr/local/bin` (sudo if needed). No Homebrew/clone logic in bash — `preflight` owns those.
+- [ ] **M9** — release automation: `release-please` maintains the release PR and cuts a versioned release on merge; a `release-binary` workflow (on `release: published`) cross-compiles arm64 and attaches `bootstrap-darwin-arm64`. Needs the `RELEASE_PLEASE_TOKEN` PAT so the release event triggers the build.
+- [ ] **M10** — `update` job: refresh binary from the latest release (sudo replace in `/usr/local/bin`) + stash-aware `git pull` on the clone
 - [ ] **M11** — README polish, optional Homebrew tap (`brew install nednella/tap/bootstrap.sh`)
+
+`preflight` (ensure Homebrew → git → repo clone, run from the root command before any job) was extracted during the install.sh redesign and is **done** — `internal/jobs/preflight.go`. It absorbs the Homebrew-install and clone steps M5/M8 originally bundled.
 
 `internal/utils/` doesn't get its own milestone — fs/symlink helpers land in the same commit as the job that first needs them.
