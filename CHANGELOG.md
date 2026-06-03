@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0](https://github.com/nednella/bootstrap.sh/compare/v1.0.0...v1.1.0) (2026-06-03)
+
+
+### Features
+
+* add update job ([33c84f8](https://github.com/nednella/bootstrap.sh/commit/33c84f89cb3d8ae5bc8517eb55c8f7fbad496ae7))
+* track the binary's version ([93511a0](https://github.com/nednella/bootstrap.sh/commit/93511a02f19940e101ad9b8969e72e22c60128dd))
+
+
+### Bug Fixes
+
+* preflight dry-run prints the real command ([1e8209f](https://github.com/nednella/bootstrap.sh/commit/1e8209f86cb5f304a0b4f8765e46bf4206f85283))
+
 ## 1.0.0 (2026-06-03)
 
 
