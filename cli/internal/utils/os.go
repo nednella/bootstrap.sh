@@ -49,6 +49,19 @@ func MkdirAll(path string, perm os.FileMode) error {
 	return os.MkdirAll(path, perm)
 }
 
+func Output(name string, args ...string) (string, error) {
+	out, err := exec.Command(name, args...).Output()
+	return strings.TrimSpace(string(out)), err
+}
+
+func PromptSudo() error {
+	if DryRun {
+		ui.Dry("sudo -v")
+		return nil
+	}
+	return Command("sudo", "-v", "-p", ui.SudoPrompt())
+}
+
 func Remove(path string) error {
 	if DryRun {
 		ui.Dry("rm " + path)

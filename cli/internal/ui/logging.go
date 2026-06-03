@@ -16,6 +16,7 @@ var (
 	warnStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("11")).MarginLeft(2).Width(8) // bright yellow
 	errorStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("9")).MarginLeft(2).Width(8) // bright red
 	dryStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).MarginLeft(2).Width(8) // grey
+	sudoStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("13")).MarginLeft(2).Width(8) // bright magenta
 	dryBodyStyle = lipgloss.NewStyle().Faint(true)
 )
 
@@ -43,6 +44,10 @@ func Info(msg string) {
 
 func Success(msg string) {
 	fmt.Println(successStyle.Render("ok") + msg)
+}
+
+func SudoPrompt() string {
+	return sudoStyle.Render("sudo") + "password: "
 }
 
 func Warn(msg string) {

@@ -1,8 +1,7 @@
 package cmd
 
 import (
-	"fmt"
-
+	"github.com/nednella/bootstrap.sh/internal/jobs"
 	"github.com/nednella/bootstrap.sh/internal/ui"
 	"github.com/spf13/cobra"
 )
@@ -13,7 +12,10 @@ var updateCmd = &cobra.Command{
 	GroupID: jobsGroupID,
 	Run: func(cmd *cobra.Command, args []string) {
 		ui.Header("update")
-		fmt.Println("update: not implemented")
+		err := jobs.Update()
+		if err != nil {
+			ui.Die(err.Error())
+		}
 	},
 }
 
