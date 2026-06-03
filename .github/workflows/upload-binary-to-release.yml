@@ -7,6 +7,10 @@ on:
 permissions:
     contents: write
 
+defaults:
+    run:
+        working-directory: cli
+
 jobs:
     build-and-release:
         runs-on: ubuntu-latest
@@ -19,7 +23,7 @@ jobs:
             - name: Setup Go
               uses: actions/setup-go@v5
               with:
-                  go-version-file: go.mod
+                  go-version-file: cli/go.mod
 
             - name: Build binary
               env:
