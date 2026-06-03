@@ -7,10 +7,10 @@ Bootstrap a fresh Mac quicker than the time it takes to make a cuppa.
 On a fresh Mac, with nothing pre-installed but `curl`:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/nednella/bootstrap.sh/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/nednella/bootstrap.sh/main/bootstrap.sh | bash
 ```
 
-This installs Homebrew (if missing), clones this repo to `~/.bootstrap.sh/`, and drops the `bootstrap` binary on `$PATH`. Symlinks point into the clone, so edits to your config files write through to the repo and can be committed back upstream.
+This downloads the latest `bootstrap` binary and drops it on `$PATH` (`/usr/local/bin`). The first time you run a job, `bootstrap` installs Homebrew (if missing) and clones this repo to `~/.bootstrap.sh/` — symlinks point into the clone, so edits to your config files write through to the repo and can be committed back upstream.
 
 ## Usage
 
