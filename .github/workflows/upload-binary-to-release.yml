@@ -7,10 +7,6 @@ on:
 permissions:
     contents: write
 
-defaults:
-    run:
-        working-directory: cli
-
 jobs:
     build-and-release:
         runs-on: ubuntu-latest
@@ -26,13 +22,9 @@ jobs:
                   go-version-file: cli/go.mod
 
             - name: Build binary
-              env:
-                  GOOS: darwin
-                  GOARCH: arm64
-                  CGO_ENABLED: "0"
-              run: go build -trimpath -ldflags="-s -w -X github.com/nednella/bootstrap.sh/internal.Version=${{ github.event.release.tag_name }}" -o bootstrap-darwin-arm64 .
+              run: make release VERSION=${{ github.event.release.tag_name }}
 
             - name: Upload binary to release
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: gh release upload ${{ github.event.release.tag_name }} bootstrap-darwin-arm64 --clobber
+              run: gh release upload ${{ github.event.release.tag_name }} bin/bootstrap-darwin-arm64 --clobber
