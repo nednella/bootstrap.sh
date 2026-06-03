@@ -1,73 +1,89 @@
 # bootstrap.sh
 
-A Go CLI that bootstraps a fresh macOS install: Homebrew + Brewfile, dotfiles, macOS preferences. Installable in one command on a truly fresh machine (only `curl` required).
+A Go CLI that bootstraps a fresh macOS install — Homebrew + Brewfile, dotfiles, macOS preferences — in one command, on a machine that has only `curl`. Apple Silicon only.
 
 ---
 
-## Architecture
+## How it works
 
-Monorepo. This repo contains both the CLI tool's Go source and the dotfiles it manages.
+Monorepo: this repo holds both the CLI's Go source (`cli/`) and the dotfiles it manages (`dotfiles/`). The binary is distributed as a prebuilt artefact on GitHub Releases (`bootstrap-darwin-arm64`).
 
-The binary is distributed as a prebuilt artefact via GitHub Releases. `bootstrap.sh` downloads it and drops it on `$PATH` (`/usr/local/bin`). On first run the binary's `preflight` clones this repo to a known location on disk (default `~/.bootstrap.sh/`). From then on, the binary uses the clone as the live source for symlinks. Edits to symlinked files write through to the clone, so changes can be committed and pushed back upstream — the dev workflow is normal git.
+There is **no self-location logic** — the binary always operates against a fixed **install location**, `~/.bootstrap.sh` (the embedded `install_path`), regardless of where the binary or the dev clone actually live. So the dev repo can sit anywhere (e.g. `~/dev/bootstrap.sh`); the install location is reserved for the clone the tool manages.
 
-The Go source ends up on disk alongside the dotfiles inside the clone. It is unused at runtime (the binary on `$PATH` is already built) — accepted as harmless dead weight in exchange for a single-curl install with no Go required on the user's machine.
-
-### Install flow (fresh Mac)
-
-User runs:
+### Install (fresh Mac)
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/nednella/bootstrap.sh/main/bootstrap.sh | bash
 ```
 
-`bootstrap.sh` is **light** — it only:
+`bootstrap.sh` is **light**: it downloads the latest `bootstrap-darwin-arm64` (via the `releases/latest/download/` redirect) and drops it at `/usr/local/bin/bootstrap` (sudo only if that dir isn't writable). It does **not** install Homebrew or clone the repo — that's `preflight`'s job.
 
-1. Downloads the latest prebuilt `bootstrap-darwin-arm64` from GitHub Releases (via the `releases/latest/download/` redirect).
-2. Drops it on `$PATH` at `/usr/local/bin/bootstrap` (sudo only if the directory isn't writable).
+### Runtime
 
-Homebrew and the repo clone are **not** bootstrap.sh's job — `preflight` (run inside the binary before any job) ensures Homebrew → git → repo clone. Re-running bootstrap.sh just refreshes the binary.
+Every **job command** runs `preflight` first (root `PersistentPreRun`, gated to job commands by Cobra `GroupID`). Preflight ensures — silently, acting only on what's missing — Homebrew → git → the repo clone at `~/.bootstrap.sh`. Then the job runs against that clone:
 
-### Runtime flow
+- `bootstrap install` — `brew bundle` against `<clone>/Brewfile`.
+- `bootstrap dotfiles` — symlink `<clone>/dotfiles/` into `$HOME` / `$XDG_CONFIG_HOME` (existing files backed up to `~/.dotfiles-backup/<timestamp>/` first).
+- `bootstrap macos` — apply macOS `defaults`.
 
-After `bootstrap.sh`, the binary is on `$PATH`. Every job command runs `preflight` first (ensure Homebrew → git → repo clone), then operates against the clone:
+Symlinks point into the clone, so editing a config file writes through to the repo — commit + push upstream with normal git from `~/.bootstrap.sh`.
 
-- `bootstrap install` — runs `brew bundle` against `<install_path>/Brewfile`.
-- `bootstrap dotfiles` — symlinks `<install_path>/dotfiles/` into `$HOME` and `$XDG_CONFIG_HOME` per the convention below. Existing files get backed up to `~/.dotfiles-backup/<timestamp>/` first.
-- `bootstrap macos` — runs the macOS settings job.
+### Update
 
-### Update flow
+`bootstrap update`:
 
-`bootstrap update` is a single command that updates both binary and content:
+1. **Binary** — fetch the latest release tag (GitHub API), `semver.Compare` it against the running binary's version; if newer, download + atomically replace `/usr/local/bin/bootstrap` (sudo, primed once via `PromptSudo`). If current, it's a no-op.
+2. **Content** — stash-aware `git pull` on the clone (stash if dirty → pull → pop), so local dotfile edits survive.
 
-1. Checks GH releases for a newer binary; if newer, downloads and replaces self at `/usr/local/bin` (sudo).
-2. Stash-aware `git pull` on the clone:
-   ```
-   git status --short            # any uncommitted changes?
-   git stash -u                  # if dirty, stash including untracked
-   git pull
-   git stash pop                 # if we stashed, restore
-   ```
+### Versioning
 
-Local edits to symlinked dotfiles survive the pull. To push local edits upstream: `cd ~/.bootstrap.sh && git commit && git push`. Standard git.
+The binary knows its own version via **ldflags injection** — `cli/internal/version.go` (`package internal; var Version = "dev"`). Release builds stamp the git tag (`-X …/internal.Version=<tag>`); local builds show `dev` (or a real `git describe` version via `make build`). Surfaced by `bootstrap --version` and the banner; consumed by `update`'s semver check. No version constant is committed — the git tag is the single source of truth.
+
+### Release (release-please)
+
+- `release-please.yml` (on push to `main`) maintains a release PR — changelog + next version derived from conventional commits — authored with the **`RELEASE_PLEASE_TOKEN`** PAT. Merging the PR tags + cuts a GitHub Release.
+- `upload-binary-to-release.yml` (on `release: published`) runs `make release VERSION=<tag>` to cross-compile `bootstrap-darwin-arm64` (the `VERSION=` override stamps the exact release tag) and attaches it. The PAT is what lets the release event trigger this second workflow.
+- To ship: push conventional commits → merge the release PR (rebase). `feat:`/`fix:` drive a release; **content-only changes** (dotfiles, Brewfile) use `chore:`/`docs:` so they propagate via `update`'s `git pull` without cutting a needless new binary.
+
+---
+
+## Repository layout
+
+```
+bootstrap.sh/
+├── bootstrap.sh         # the curl one-liner: downloads + installs the binary
+├── Brewfile             # consumed by `bootstrap install`
+├── Makefile             # build/run with the version stamped from git
+├── dotfiles/            # consumed by `bootstrap dotfiles` (ghostty, git, starship, zsh)
+├── .github/workflows/   # release-please.yml + upload-binary-to-release.yml
+├── CLAUDE.md  README.md  CHANGELOG.md
+└── cli/                 # the Go tool (go.mod lives here — build from cli/)
+    ├── main.go          # thin: wires Cobra, defers to cmd/
+    ├── cmd/             # one file per command: parse → call internal/jobs  (interface layer)
+    └── internal/
+        ├── version.go   # package internal: var Version (ldflags-injected)
+        ├── config/      # embedded default_config.yaml + loader
+        ├── jobs/        # one file per job: preflight, install, dotfiles, macos, update  (logic layer)
+        ├── ui/          # banner + styled logging
+        └── utils/       # dry-run-aware shell-out runner, fs/symlink/exec helpers
+```
+
+`cmd/` is the *interface* layer (Cobra); `internal/jobs/` is the *logic* layer — same shape as API endpoint ↔ service.
 
 ---
 
 ## Configuration
 
-A YAML config (`internal/config/default_config.yaml`) is embedded into the binary via `//go:embed`. To change defaults, edit the YAML in source and release a new binary.
-
-CLAUDE.md does not duplicate the defaults — see the YAML file for what's configurable.
-
-There is no runtime config-file overlay (yet). Single-user tool; the embedded YAML is the source of truth.
+`cli/internal/config/default_config.yaml` is embedded via `//go:embed` — the source of truth for `install_path` (`~/.bootstrap.sh`), `backup_path`, `repo_url`. No runtime config overlay; change a default in source and release a new binary.
 
 ---
 
 ## Dotfiles convention
 
-The `dotfiles/` tree is flat: one directory per program. Within each program directory, the symlink destination is determined by a single rule:
+Flat tree, **one directory per program**. Within a program directory the symlink destination follows a single rule:
 
-- Files starting with `.` are symlinked relative to `$HOME`.
-- Files not starting with `.` are symlinked relative to `${XDG_CONFIG_HOME:-$HOME/.config}/<program>/`.
+- File starts with `.` → symlinked into `$HOME`.
+- Otherwise → `${XDG_CONFIG_HOME:-$HOME/.config}/<program>/`.
 
 | Source | Destination |
 |---|---|
@@ -76,67 +92,49 @@ The `dotfiles/` tree is flat: one directory per program. Within each program dir
 | `dotfiles/ghostty/config` | `~/.config/ghostty/config` |
 | `dotfiles/starship/starship.toml` | `~/.config/starship/starship.toml` |
 
-No metadata files needed — the dot prefix carries the intent.
+The dot prefix carries the intent — no metadata files. The walk skips non-directories, so a loose file in `dotfiles/` would be ignored (which is why the `Brewfile` lives at the repo root, not here).
 
 ---
 
 ## Command surface
 
 ```
-bootstrap                 # run all jobs in order (install, dotfiles, macos)
-bootstrap install         # install packages from Brewfile
-bootstrap dotfiles        # symlink dotfiles into $HOME / XDG
-bootstrap macos           # apply macOS preferences
-bootstrap update          # update binary + pull latest content
-
---dry-run                 # global flag; print what would happen, change nothing
+bootstrap install     # install packages from Brewfile
+bootstrap dotfiles    # symlink dotfiles into $HOME / XDG
+bootstrap macos       # apply macOS preferences
+bootstrap update      # update the binary (version-checked) + pull latest content
+bootstrap --version   # print the version
+--dry-run / -d        # global flag: print what would happen, change nothing
 ```
 
-CLI is built with **Cobra**. `main.go` is thin (wires the root command, defers everything else to `cmd/`).
+Bare `bootstrap` prints Cobra's help — **by design**. There is intentionally no run-all entry point; each job is invoked explicitly.
 
 ---
 
-## Repository layout
+## Build & development
 
-```
-bootstrap.sh/
-├── CLAUDE.md           # this file
-├── README.md           # user-facing docs
-├── bootstrap.sh          # the curl one-liner: downloads + installs the prebuilt binary
-├── Brewfile            # consumed by `bootstrap install` from the clone at runtime
-├── dotfiles/           # consumed by `bootstrap dotfiles` from the clone at runtime
-│   ├── ghostty/
-│   ├── git/
-│   ├── zsh/
-│   └── ...
-├── .github/workflows/  # release-please (version + release PR) + release-binary (build & attach)
-├── go.mod
-├── main.go             # Cobra root + subcommand wiring; thin
-├── cmd/                # one file per subcommand: parse → call into internal/jobs
-└── internal/
-    ├── config/         # embedded YAML + loader
-    ├── ui/             # styled output, status messages, prompts
-    ├── jobs/           # one file per job: preflight, install, dotfiles, macos, update — actual work
-    └── utils/          # shared primitives added just-in-time (shell-out runner, fs, symlinks)
+`go.mod` lives in `cli/`, so build/run from there — or use the Makefile, which stamps the version from `git describe` (otherwise local builds show `dev`):
+
+```sh
+make build               # → bin/bootstrap, version stamped
+make run ARGS="macos -d" # run from source with the version stamped
+cd cli && go build ./... # plain compile check
 ```
 
-`cmd/` is the *interface* layer (Cobra). `internal/jobs/` is the *logic* layer. Same shape as API endpoint ↔ service.
+`--dry-run` previews any job without touching the system — everything destructive routes through `utils.Command`, which prints the command instead of running it when the flag is set.
 
 ---
 
 ## Conventions
 
 ### Terminology
-
 The unit of work is always a **job**. Never "phase", "step", or "task".
 
 ### Language
-
-British English (en-GB) in commits, comments, prose, and identifiers I control (`colour`, `behaviour`, `initialise`). Standard Go stdlib names stay American (`color.Color`, etc.) — those are not mine to control.
+British English (en-GB) in commits, comments, prose, and identifiers I control (`colour`, `behaviour`, `initialise`). Standard Go stdlib names stay American (`color.Color`, etc.) — not mine to control.
 
 ### Go style
-
-Never write `if err := foo(); err != nil { ... }`. Split assignment onto its own line:
+Never write `if err := foo(); err != nil { ... }`. Split the assignment onto its own line:
 
 ```go
 err := foo()
@@ -146,47 +144,19 @@ if err != nil {
 ```
 
 ### Declaration order
-
-A function called by a neighbouring function — a helper in a local call chain — sits in execution (reading) order, caller above callee (see `internal/jobs/preflight.go`, `internal/jobs/dotfiles.go`). A function only ever called from elsewhere — an independent primitive or entry point — is ordered alphabetically (see `internal/utils/os.go`).
+A function called by a neighbouring function — a helper in a local call chain — sits in execution (reading) order, caller above callee (see `cli/internal/jobs/preflight.go`, `cli/internal/jobs/dotfiles.go`). A function only ever called from elsewhere — an independent primitive or entry point — is ordered alphabetically (see `cli/internal/utils/os.go`).
 
 ### Casing
-
-Standard Go: exported identifiers `PascalCase`, unexported `camelCase`, initialisms all-caps (`URL`, `ID`, `HTTP`). Never export a helper purely so another package can reach it — that breaks the casing consistency of its sibling helpers. Route the cross-package call through the package's public entry point instead.
+Standard Go: exported `PascalCase`, unexported `camelCase`, initialisms all-caps (`URL`, `ID`, `HTTP`). Never export a helper purely so another package can reach it — that breaks the casing consistency of its sibling helpers. Route the cross-package call through the package's public entry point instead.
 
 ### Comments
-
-Code should be self-descriptive — comments should not be needed. Don't write doc or inline comments; reach for clearer names instead. Compiler directives (`//go:embed`) are not comments and stay.
+Code should be self-descriptive — comments shouldn't be needed. Don't write doc or inline comments; reach for clearer names instead. Compiler/tooling directives (`//go:embed`, release-please markers) are not comments and stay.
 
 ### Style var naming
-
 Prefix style vars with the feature that consumes them: `headerArrowStyle`, not `arrowStyle`.
 
 ### Commit discipline
-
-"and" / "&" in a commit subject means the commit should be split into multiple commits. One logical change per commit. Subject-only — no commit body unless genuinely load-bearing.
+"and" / "&" in a commit subject means split into multiple commits — one logical change per commit. Subject-only; no body unless genuinely load-bearing. Before committing, check what's actually staged (`git diff --cached`) — `git mv` pre-stages renames, which is easy to sweep into the wrong commit.
 
 ### Command framing
-
-Describe commands (Cobra `Short`/`Long`, README usage, command-surface lines) by the **primary action**. Prerequisites and defensive checks are implementation detail, not user-facing copy.
-
----
-
-## Milestones
-
-Remaining milestones are ordered by the planned order of work.
-
-- [x] **M1** — Cobra CLI skeleton: root command, subcommand dispatch, help text (no job logic yet)
-- [x] **M2** — `internal/config`: embedded YAML loader (`go:embed default_config.yaml`)
-- [x] **M3** — `internal/ui`: styled output, status messages, prompts
-- [x] **M4** — dry-run plumbing: shell-out runner that honours `--dry-run`; everything destructive routes through it
-- [x] **M5** — `install` job: `brew bundle` against the clone's Brewfile (Homebrew now ensured by preflight)
-- [x] **M6** — `dotfiles` job: walk `dotfiles/<program>/`, symlink per convention; back up existing first
-- [x] **M7** — `macos` job: macOS settings via `defaults write` (ByHost-aware), then restart affected services
-- [ ] **M8** — `bootstrap.sh` (the curl one-liner): download `bootstrap-darwin-arm64` from the latest release and drop it at `/usr/local/bin` (sudo if needed). No Homebrew/clone logic in bash — `preflight` owns those.
-- [ ] **M9** — release automation: `release-please` maintains the release PR and cuts a versioned release on merge; a `release-binary` workflow (on `release: published`) cross-compiles arm64 and attaches `bootstrap-darwin-arm64`. Needs the `RELEASE_PLEASE_TOKEN` PAT so the release event triggers the build.
-- [ ] **M10** — `update` job: refresh binary from the latest release (sudo replace in `/usr/local/bin`) + stash-aware `git pull` on the clone
-- [ ] **M11** — README polish, optional Homebrew tap (`brew install nednella/tap/bootstrap.sh`)
-
-`preflight` (ensure Homebrew → git → repo clone, run from the root command before any job) was extracted during the bootstrap.sh redesign and is **done** — `internal/jobs/preflight.go`. It absorbs the Homebrew-install and clone steps M5/M8 originally bundled.
-
-`internal/utils/` doesn't get its own milestone — fs/symlink helpers land in the same commit as the job that first needs them.
+Describe commands (Cobra `Short`/`Long`, README, command-surface lines) by the **primary action**. Prerequisites and defensive checks are implementation detail, not user-facing copy.
