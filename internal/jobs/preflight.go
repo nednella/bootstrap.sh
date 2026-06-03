@@ -50,10 +50,6 @@ func ensureHomebrew(missing bool) error {
 	if !missing {
 		return nil
 	}
-	if utils.DryRun {
-		ui.Info("Homebrew — would install (non-interactive)")
-		return nil
-	}
 	ui.Info("Homebrew — installing (non-interactive) ...")
 	return utils.Command("/bin/bash", "-c", brewInstaller)
 }
@@ -67,10 +63,6 @@ func ensureGit(missing bool) error {
 
 func ensureRepo(cfg *config.Config, missing bool) error {
 	if !missing {
-		return nil
-	}
-	if utils.DryRun {
-		ui.Info("Repository — would clone to " + cfg.InstallPath)
 		return nil
 	}
 	ui.Info("Repository — cloning to " + cfg.InstallPath + " ...")
