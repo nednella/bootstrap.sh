@@ -20,8 +20,6 @@ var (
 	bannerArtStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("14")).Bold(true) // bright cyan
 	bannerCreditStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).Align(lipgloss.Right)
 	bannerMetaStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).Align(lipgloss.Center)
-
-	farewellBoldStyle = lipgloss.NewStyle().Bold(true)
 )
 
 func Banner() {
@@ -35,9 +33,4 @@ func Banner() {
 	fmt.Println(bannerCreditStyle.Width(width).Render("by @nednella"))
 	fmt.Println(bannerMetaStyle.Width(width).Render(meta))
 	fmt.Println()
-}
-
-func Farewell(elapsed int) {
-	fmt.Println()
-	fmt.Println(successStyle.Render("ok") + farewellBoldStyle.Render("Bootstrap complete") + fmt.Sprintf(" in %ds.", elapsed))
 }
