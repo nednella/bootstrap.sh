@@ -125,6 +125,25 @@ cd cli && go build ./... # plain compile check
 
 ---
 
+## Ideas (future work)
+
+Not built yet — a rough backlog, unordered within each group.
+
+**Split `update`, add a version pin** (agreed direction)
+- Split `update` in two: `bootstrap update` = the binary only (self-update); `bootstrap sync` = the content (stash-aware `git pull` on the clone). They're independent — different cadences, no shared state — so bundling them was only convenience.
+- Add a version specifier to `update` for pin/rollback: `bootstrap update --version <tag>` (or `-v`), fetching the stable `releases/download/<tag>/bootstrap-darwin-arm64` asset. Allow a downgrade with confirmation; keep the semver "newer only" guard on the no-arg path. ⚠️ `--version` is already the global flag (prints the build version), so this likely needs a different name (`--tag` / `--pin`) or careful scoping. `bootstrap.sh` could honour a `BOOTSTRAP_VERSION` env for the same pin at install time.
+
+**Reversibility**
+- `bootstrap dotfiles --undo` / `-u` — reverse the symlinks, restore originals from `~/.dotfiles-backup`. Also makes lifecycle testing trivial.
+
+**Externalise macOS defaults** (TODO — removes real friction)
+- Settings live *inside the binary* today (`macosDefault` structs in `cli/internal/jobs/macos.go`), so tweaking one needs a `feat:`/`fix:` and a whole new binary release. Move them out into repo *content* — a data file in the clone (e.g. `macos/defaults.yaml`) the binary reads at runtime — so edits propagate via content `sync` with no binary bump, exactly like the Brewfile and dotfiles already do. Caveat: the file format couples to the binary's parser, so a brand-new setting *type* could still need a binary change; adding/removing individual settings wouldn't.
+
+**UX polish** (vague, low priority)
+- Replace some raw stdout (`git pull`, `brew bundle`, the binary download) with loaders / spinners / progress — no specifics yet, just "might be nicer." If pursued: gate behind `term.IsTerminal`, and don't let a spinner swallow the sudo prompt.
+
+---
+
 ## Conventions
 
 ### Terminology
