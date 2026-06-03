@@ -50,7 +50,7 @@ func ensureHomebrew(missing bool) error {
 	if !missing {
 		return nil
 	}
-	ui.Info("Homebrew — installing (non-interactive) ...")
+	ui.Info("Homebrew — installing ...")
 	return utils.Command("/bin/bash", "-c", brewInstaller)
 }
 

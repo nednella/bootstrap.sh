@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
+	"github.com/nednella/bootstrap.sh/internal"
 )
 
 const bannerArt = `     _                 _       _                        _
@@ -15,14 +16,10 @@ const bannerArt = `     _                 _       _                        _
     |_.__/ \___/ \___/ \__|___/\__|_|  \__,_| .__(_)___/_| |_|
                                             |_|`
 
-const rule = "════════════════════════════════════════════════════════════════════════════════════════════════════"
-
 var (
-	ruleStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).MarginTop(1).MarginBottom(1) // dim grey
-
-	bannerArtStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("14")).Bold(true) // bright
-	bannerCreditStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).MarginLeft(50)
-	bannerTaglineStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).MarginLeft(4).MarginTop(1)
+	bannerArtStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("14")).Bold(true) // bright cyan
+	bannerCreditStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).Align(lipgloss.Right)
+	bannerMetaStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).Align(lipgloss.Center)
 
 	farewellBoldStyle = lipgloss.NewStyle().Bold(true)
 )
@@ -30,17 +27,17 @@ var (
 func Banner() {
 	platform := "macos-" + runtime.GOARCH
 	today := time.Now().Format("2 January 2006")
+	meta := internal.Version + " · " + platform + " · " + today
+	width := lipgloss.Width(bannerArt)
 
-	fmt.Println(ruleStyle.Render(rule))
+	fmt.Println()
 	fmt.Println(bannerArtStyle.Render(bannerArt))
-	fmt.Println(bannerCreditStyle.Render("by @nednella"))
-	fmt.Println(bannerTaglineStyle.Render("Bootstrap a fresh Mac quicker than the time it takes to make a cuppa."))
-	fmt.Println(bannerTaglineStyle.Render(fmt.Sprintf("%s (%s)", platform, today)))
-	fmt.Println(ruleStyle.Render(rule))
+	fmt.Println(bannerCreditStyle.Width(width).Render("by @nednella"))
+	fmt.Println(bannerMetaStyle.Width(width).Render(meta))
+	fmt.Println()
 }
 
 func Farewell(elapsed int) {
-	fmt.Println(ruleStyle.Render(rule))
+	fmt.Println()
 	fmt.Println(successStyle.Render("ok") + farewellBoldStyle.Render("Bootstrap complete") + fmt.Sprintf(" in %ds.", elapsed))
-	fmt.Println(ruleStyle.Render(rule))
 }

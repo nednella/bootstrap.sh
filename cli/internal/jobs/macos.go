@@ -43,7 +43,7 @@ func MacOS() error {
 
 // System Settings can overwrite our writes when it closes, so quit it first.
 func closeSystemSettings() {
-	ui.Info("Closing System Settings...")
+	ui.Info("Closing System Settings ...")
 	_ = utils.Command("pkill", "-x", "System Settings")
 }
 
@@ -57,7 +57,7 @@ func applyDefault(s macosDefault) error {
 }
 
 func restartServices() {
-	ui.Info("Restarting services...")
+	ui.Info("Restarting services ...")
 	for _, app := range services {
 		_ = utils.Command("killall", app)
 	}
