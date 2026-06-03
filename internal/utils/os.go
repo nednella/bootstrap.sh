@@ -9,8 +9,6 @@ import (
 	"github.com/nednella/bootstrap.sh/internal/ui"
 )
 
-var DryRun bool
-
 func Command(name string, args ...string) error {
 	if DryRun {
 		ui.Dry(name + " " + strings.Join(args, " "))
@@ -23,11 +21,22 @@ func Command(name string, args ...string) error {
 	return cmd.Run()
 }
 
+func Exists(path string) bool {
+	_, err := os.Lstat(path)
+	return err == nil
+}
+
+func IsSymlinked(path string) bool {
+	info, err := os.Lstat(path)
+	return err == nil && info.Mode()&os.ModeSymlink != 0
+}
+
+func IsSymlinkedTo(target, src string) bool {
+	current, err := os.Readlink(target)
+	return err == nil && current == src
+}
+
 func Lookup(name string) bool {
-	if DryRun {
-		ui.Dry("command -v " + name)
-		return true
-	}
 	_, err := exec.LookPath(name)
 	return err == nil
 }

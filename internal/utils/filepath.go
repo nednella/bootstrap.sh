@@ -18,21 +18,6 @@ func DisplayName(target string) string {
 	return rel
 }
 
-func Exists(path string) bool {
-	_, err := os.Lstat(path)
-	return err == nil
-}
-
-func IsSymlinked(path string) bool {
-	info, err := os.Lstat(path)
-	return err == nil && info.Mode()&os.ModeSymlink != 0
-}
-
-func IsSymlinkedTo(target, src string) bool {
-	current, err := os.Readlink(target)
-	return err == nil && current == src
-}
-
 func mustHome() string {
 	h, err := os.UserHomeDir()
 	if err != nil {
