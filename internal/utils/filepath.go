@@ -3,6 +3,7 @@ package utils
 import (
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 var (
@@ -16,6 +17,13 @@ func DisplayName(target string) string {
 		return target
 	}
 	return rel
+}
+
+func ExpandHome(path string) string {
+	if !strings.HasPrefix(path, "~/") {
+		return path
+	}
+	return filepath.Join(Home, path[2:])
 }
 
 func mustHome() string {

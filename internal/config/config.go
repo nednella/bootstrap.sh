@@ -2,10 +2,8 @@ package config
 
 import (
 	_ "embed"
-	"os"
-	"path/filepath"
-	"strings"
 
+	"github.com/nednella/bootstrap.sh/internal/utils"
 	"gopkg.in/yaml.v3"
 )
 
@@ -24,21 +22,8 @@ func Load() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	
-	cfg.InstallPath = expandHome(cfg.InstallPath)
-	cfg.BackupPath = expandHome(cfg.BackupPath)
+
+	cfg.InstallPath = utils.ExpandHome(cfg.InstallPath)
+	cfg.BackupPath = utils.ExpandHome(cfg.BackupPath)
 	return cfg, nil
-}
-
-func expandHome(path string) string {
-	if !strings.HasPrefix(path, "~/") {
-		return path
-	}
-
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return path
-	}
-
-	return filepath.Join(home, path[2:])
 }
