@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/nednella/bootstrap.sh/internal"
 	"github.com/nednella/bootstrap.sh/internal/jobs"
 	"github.com/nednella/bootstrap.sh/internal/ui"
@@ -23,6 +25,7 @@ Installs Homebrew + Brewfile, symlinks dotfiles into $HOME, and applies macOS pr
 		utils.DryRun = dryRun
 		ui.Banner()
 		if dryRun {
+			fmt.Println()
 			ui.Warn("DRY RUN — no changes will be made")
 		}
 

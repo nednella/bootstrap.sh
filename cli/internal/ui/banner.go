@@ -31,6 +31,6 @@ func Banner() {
 	fmt.Println()
 	fmt.Println(bannerArtStyle.Render(bannerArt))
 	fmt.Println(bannerCreditStyle.Width(width).Render("by @nednella"))
-	fmt.Println(bannerMetaStyle.Width(width).Render(meta))
 	fmt.Println()
+	fmt.Println(bannerMetaStyle.Width(width).Render(meta))
 }
