@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/nednella/bootstrap.sh/compare/v1.1.0...v1.1.1) (2026-06-03)
+
+
+### Bug Fixes
+
+* banner spacing ([a9d9669](https://github.com/nednella/bootstrap.sh/commit/a9d96698e468fd63059b6ff50bd72cfa601ae126))
+
 ## [1.1.0](https://github.com/nednella/bootstrap.sh/compare/v1.0.0...v1.1.0) (2026-06-03)
 
 
