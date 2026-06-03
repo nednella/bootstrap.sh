@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/nednella/bootstrap.sh/internal"
 	"github.com/nednella/bootstrap.sh/internal/jobs"
 	"github.com/nednella/bootstrap.sh/internal/ui"
 	"github.com/nednella/bootstrap.sh/internal/utils"
@@ -17,6 +18,7 @@ var rootCmd = &cobra.Command{
 	Long: `Bootstrap a fresh Mac quicker than the time it takes to make a cuppa.
 
 Installs Homebrew + Brewfile, symlinks dotfiles into $HOME, and applies macOS preferences.`,
+	Version: internal.Version,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		utils.DryRun = dryRun
 		ui.Banner()

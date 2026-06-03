@@ -1,9 +1,14 @@
 package jobs
 
 import (
+	"encoding/json"
+	"strings"
+
+	"github.com/nednella/bootstrap.sh/internal"
 	"github.com/nednella/bootstrap.sh/internal/config"
 	"github.com/nednella/bootstrap.sh/internal/ui"
 	"github.com/nednella/bootstrap.sh/internal/utils"
+	"golang.org/x/mod/semver"
 )
 
 const (
@@ -31,11 +36,21 @@ func Update() error {
 }
 
 func updateBinary(repoURL string) error {
+	latest, err := latestVersion(repoURL)
+	if err != nil {
+		return err
+	}
+
+	if semver.Compare(internal.Version, latest) >= 0 {
+		ui.Info("Binary — up to date (" + internal.Version + ")")
+		return nil
+	}
+
+	ui.Info("Binary — updating " + internal.Version + " → " + latest + " (sudo) ...")
 	url := repoURL + "/releases/latest/download/" + binaryAsset
 	staged := binaryDest + ".new"
 
-	ui.Info("Binary — updating " + binaryDest + " (sudo) ...")
-	err := utils.PromptSudo()
+	err = utils.PromptSudo()
 	if err != nil {
 		return err
 	}
@@ -48,6 +63,19 @@ func updateBinary(repoURL string) error {
 		return err
 	}
 	return utils.Command("sudo", "mv", staged, binaryDest)
+}
+
+func latestVersion(repoURL string) (string, error) {
+	api := strings.Replace(repoURL, "https://github.com/", "https://api.github.com/repos/", 1) + "/releases/latest"
+	out, err := utils.Output("curl", "-fsSL", api)
+	if err != nil {
+		return "", err
+	}
+	var release struct {
+		TagName string `json:"tag_name"`
+	}
+	err = json.Unmarshal([]byte(out), &release)
+	return release.TagName, err
 }
 
 func updateContent(clone string) error {
