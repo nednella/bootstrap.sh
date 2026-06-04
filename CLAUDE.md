@@ -135,14 +135,18 @@ cd cli && go build ./... # plain compile check
 
 Not built yet — a rough backlog, unordered within each group.
 
-**Version select / rollback for `update`** (agreed direction)
+**Version select / rollback for `update`** (agreed direction — next up: `-t` then `-l`)
 - Add `bootstrap update --tag <tag>` / `-t <tag>` to install a specific release, fetching the stable `releases/download/<tag>/bootstrap-darwin-arm64` asset; allow a downgrade with confirmation, keep the semver "newer only" guard on the no-arg path. `--tag`/`-t` sidesteps the global `--version`/`-v` (which prints the build version). Must run atomically, like every job.
+- Add `bootstrap update --list` / `-l` to print the available release tags (GitHub Releases API), newest first, marking the current one. It's the menu that `--tag` selects from — same binary-release concern, so it lives on `update` rather than a standalone command (a read-only query has no place in a job-only surface). The three modes read as one command: bare (latest), `--tag` (specific), `--list` (show choices); `-t`/`-l` stay clear of the global `-v`. Still runs `preflight` as a silent no-op — preflight is gated flatly by job-command `GroupID`, never scoped per-flag, so there's no "does this need preflight?" judgement to forget.
 
 **Reversibility** (agreed direction)
 - `bootstrap dotfiles --undo` / `-u` — reverse the symlinks and restore originals from the latest `~/.dotfiles-backup/<timestamp>/`. The backup mirrors each file's `$HOME`-relative path, so the restore is a clean inverse walk. Must run atomically, like every job. Also makes lifecycle testing trivial.
 
 **UX polish** (vague, low priority)
 - Replace some raw stdout (`git pull`, `brew bundle`, the binary download) with loaders / spinners / progress — no specifics yet, just "might be nicer." If pursued: gate behind `term.IsTerminal`, and don't let a spinner swallow the sudo prompt.
+
+**Interactivity** (vague, low priority)
+- Interactive selection where a flag currently takes an explicit value: pick a version from the `update --list` output instead of typing `--tag`, or select specific apps/dotfiles to install/symlink rather than doing the whole set. Same caveats as the spinners above — gate behind `term.IsTerminal` so non-TTY/CI runs stay non-interactive, and keep the explicit-flag path as the scriptable default (the prompt is a convenience layer over it, never the only way in). Atomicity still holds: the selection just feeds the same job.
 
 ---
 
