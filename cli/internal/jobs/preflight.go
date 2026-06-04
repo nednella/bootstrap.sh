@@ -66,7 +66,11 @@ func ensureRepo(cfg *config.Config, missing bool) error {
 		return nil
 	}
 	ui.Info("Cloning repository ...")
-	return utils.Command("git", "clone", cfg.RepoURL, cfg.InstallPath)
+	err := utils.Command("git", "clone", cfg.RepoURL, cfg.InstallPath)
+	if err != nil {
+		return fmt.Errorf("failed to clone %s — check your network and repository access: %w", cfg.RepoURL, err)
+	}
+	return nil
 }
 
 func addBrewToPath() error {
