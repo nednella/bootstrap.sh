@@ -20,7 +20,7 @@ func Install() error {
 		return fmt.Errorf("Brewfile not found: %s", brewfile)
 	}
 
-	ui.Info("Installing packages from " + brewfile)
+	ui.Info("Installing packages ...")
 	err = utils.Command("brew", "bundle", "--file="+brewfile)
 	if err != nil {
 		return err

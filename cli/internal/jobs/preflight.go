@@ -50,7 +50,7 @@ func ensureHomebrew(missing bool) error {
 	if !missing {
 		return nil
 	}
-	ui.Info("Homebrew — installing ...")
+	ui.Info("Installing Homebrew ...")
 	return utils.Command("/bin/bash", "-c", brewInstaller)
 }
 
@@ -65,7 +65,7 @@ func ensureRepo(cfg *config.Config, missing bool) error {
 	if !missing {
 		return nil
 	}
-	ui.Info("Repository — cloning to " + cfg.InstallPath + " ...")
+	ui.Info("Cloning repository ...")
 	return utils.Command("git", "clone", cfg.RepoURL, cfg.InstallPath)
 }
 

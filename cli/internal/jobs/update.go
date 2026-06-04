@@ -32,7 +32,7 @@ func Update() error {
 		return nil
 	}
 
-	ui.Info("Updating binary " + internal.Version + " → " + latest + " (sudo) ...")
+	ui.Info("Updating binary " + internal.Version + " → " + latest + " (requires sudo) ...")
 	url := cfg.RepoURL + "/releases/latest/download/" + binaryAsset
 	staged := binaryDest + ".new"
 
