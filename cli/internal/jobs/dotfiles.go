@@ -118,11 +118,12 @@ func replaceLink(src, target, name string) error {
 }
 
 func backupAndLink(src, target, backupDir, name string) error {
-	err := utils.MkdirAll(backupDir, 0755)
+	dest := filepath.Join(backupDir, name)
+	err := utils.MkdirAll(filepath.Dir(dest), 0755)
 	if err != nil {
 		return err
 	}
-	err = utils.Rename(target, filepath.Join(backupDir, filepath.Base(target)))
+	err = utils.Rename(target, dest)
 	if err != nil {
 		return err
 	}
