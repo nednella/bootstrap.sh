@@ -1,0 +1,12 @@
+services:
+    - ControlCenter
+    - Dock
+    - Finder
+    - SystemUIServer
+
+defaults:
+    - domain: com.apple.controlcenter
+      key: BatteryShowPercentage
+      value_type: bool
+      value: "true"
+      current_host: true

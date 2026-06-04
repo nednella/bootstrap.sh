@@ -1,43 +1,55 @@
 package jobs
 
 import (
-	"slices"
+	"fmt"
+	"path/filepath"
 
+	"github.com/nednella/bootstrap.sh/internal/config"
 	"github.com/nednella/bootstrap.sh/internal/ui"
 	"github.com/nednella/bootstrap.sh/internal/utils"
 )
 
 type macosDefault struct {
-	currentHost bool // some settings must target the current user instead of global
-	domain      string
-	key         string
-	valueType   string
-	value       string
+	Domain      string `yaml:"domain"`
+	Key         string `yaml:"key"`
+	ValueType   string `yaml:"value_type"`
+	Value       string `yaml:"value"`
+	CurrentHost bool   `yaml:"current_host"`
 }
 
-var dockSettings = []macosDefault{}
-
-var finderSettings = []macosDefault{}
-
-var menuBarSettings = []macosDefault{
-	{true, "com.apple.controlcenter", "BatteryShowPercentage", "-bool", "true"},
+type macosSettings struct {
+	Defaults []macosDefault `yaml:"defaults"`
+	Services []string       `yaml:"services"`
 }
-
-var services = []string{"ControlCenter", "Dock", "Finder", "SystemUIServer"}
 
 func MacOS() error {
+	cfg, err := config.Load()
+	if err != nil {
+		return err
+	}
+
+	path := filepath.Join(cfg.InstallPath, "macos", "settings.yaml")
+	if !utils.Exists(path) {
+		return fmt.Errorf("macOS settings not found: %s", path)
+	}
+
+	settings := &macosSettings{}
+	err = utils.LoadYAML(path, settings)
+	if err != nil {
+		return err
+	}
+
 	closeSystemSettings()
 
-	settings := slices.Concat(dockSettings, finderSettings, menuBarSettings)
-	for _, s := range settings {
-		err := applyDefault(s)
+	for _, d := range settings.Defaults {
+		err := applyDefault(d)
 		if err != nil {
 			return err
 		}
 	}
 
-	restartServices()
-	ui.Success("macOS defaults applied")
+	restartServices(settings.Services)
+	ui.Success("macOS settings applied")
 	return nil
 }
 
@@ -47,16 +59,16 @@ func closeSystemSettings() {
 	_ = utils.Command("pkill", "-x", "System Settings")
 }
 
-func applyDefault(s macosDefault) error {
-	ui.Info(s.key + " → " + s.value)
-	args := []string{"write", s.domain, s.key, s.valueType, s.value}
-	if s.currentHost {
+func applyDefault(d macosDefault) error {
+	ui.Info(d.Domain + " " + d.Key + " → " + d.Value)
+	args := []string{"write", d.Domain, d.Key, "-" + d.ValueType, d.Value}
+	if d.CurrentHost {
 		args = append([]string{"-currentHost"}, args...)
 	}
 	return utils.Command("defaults", args...)
 }
 
-func restartServices() {
+func restartServices(services []string) {
 	ui.Info("Restarting services ...")
 	for _, app := range services {
 		_ = utils.Command("killall", app)
