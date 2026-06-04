@@ -7,6 +7,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// Preflight needs this config file to know where to clone in the first place,
+// so it must be available before any clone exists, hence we use embedded.
+
 //go:embed default_config.yaml
 var defaultConfigYAML []byte
 
