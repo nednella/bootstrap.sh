@@ -38,6 +38,12 @@ Installs Homebrew + Brewfile, symlinks dotfiles into $HOME, and applies macOS pr
 			ui.Die(err.Error())
 		}
 	},
+	PersistentPostRun: func(cmd *cobra.Command, args []string) {
+		if cmd.GroupID != jobsGroupID {
+			return
+		}
+		ui.Footer()
+	},
 }
 
 func Execute() error {

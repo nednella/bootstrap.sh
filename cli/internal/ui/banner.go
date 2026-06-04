@@ -34,3 +34,7 @@ func Banner() {
 	fmt.Println()
 	fmt.Println(bannerMetaStyle.Width(width).Render(meta))
 }
+
+func Footer() {
+	fmt.Println()
+}

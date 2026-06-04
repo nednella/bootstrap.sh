@@ -22,6 +22,7 @@ var (
 
 func Die(msg string) {
 	Error(msg)
+	Footer()
 	os.Exit(1)
 }
 
