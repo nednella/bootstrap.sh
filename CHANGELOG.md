@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.3.0](https://github.com/nednella/bootstrap.sh/compare/v1.2.0...v1.3.0) (2026-06-04)
+
+
+### Features
+
+* split local repository updates into dedicated sync command ([40aa46e](https://github.com/nednella/bootstrap.sh/commit/40aa46e14dbbffb674467d15d51f2bcabbffbc4e))
+
+
+### Bug Fixes
+
+* add context to malformed settings parse error ([c710b0a](https://github.com/nednella/bootstrap.sh/commit/c710b0a9fe81b8b8dde119a51866b64db2146ea8))
+* add context to repository clone failure ([2ae3c18](https://github.com/nednella/bootstrap.sh/commit/2ae3c18abf29720ab12c0f24cb88aab231a58bf1))
+* clean up the staged binary on a failed update ([6227802](https://github.com/nednella/bootstrap.sh/commit/62278020b04b5b2ee0ef0c45ead41661650ad8c5))
+* guard against an invalid release tag ([41d10b8](https://github.com/nednella/bootstrap.sh/commit/41d10b8756009b63b6a90c613e9c119c681f79b7))
+* preserve path structure in dotfiles backups ([768cde9](https://github.com/nednella/bootstrap.sh/commit/768cde96bfbb54b5f284498a11daebb7a4798678))
+* rebase with autostash during sync ([9a0a99e](https://github.com/nednella/bootstrap.sh/commit/9a0a99e269d33aa23e6fd165ecfa508e241b0d4e))
+* reject incomplete macOS settings ([8e26399](https://github.com/nednella/bootstrap.sh/commit/8e26399fc4ba001b1d4ac89832b345cd076c6f40))
+* skip self-update on development builds ([d9b0fc9](https://github.com/nednella/bootstrap.sh/commit/d9b0fc97e58efa86a33cb3b33b018986e62624d1))
+* strip quarantine xattr on self-update ([3a9234f](https://github.com/nednella/bootstrap.sh/commit/3a9234f0c0e09fe77a4b349a016d23ef43579a47))
+
 ## [1.2.0](https://github.com/nednella/bootstrap.sh/compare/v1.1.1...v1.2.0) (2026-06-04)
 
 
