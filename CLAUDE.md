@@ -28,12 +28,14 @@ Every **job command** runs `preflight` first (root `PersistentPreRun`, gated to 
 
 Symlinks point into the clone, so editing a config file writes through to the repo — commit + push upstream with normal git from `~/.bootstrap.sh`.
 
-### Update
+### Update & sync
 
-`bootstrap update`:
+Two independent maintenance commands — different cadences, no shared state:
 
-1. **Binary** — fetch the latest release tag (GitHub API), `semver.Compare` it against the running binary's version; if newer, download + atomically replace `/usr/local/bin/bootstrap` (sudo, primed once via `PromptSudo`). If current, it's a no-op.
-2. **Content** — stash-aware `git pull` on the clone (stash if dirty → pull → pop), so local dotfile edits survive.
+- `bootstrap update` — **binary only**. Fetch the latest release tag (GitHub API), `semver.Compare` it against the running binary's version; if newer, download + atomically replace `/usr/local/bin/bootstrap` (sudo, primed once via `PromptSudo`). If current, it's a no-op.
+- `bootstrap sync` — **content only**. `git pull --rebase --autostash` on the clone, so local dotfile edits are stashed, the pull replays on top, and they're restored — surviving the update.
+
+Both are job commands too, so `preflight` runs first — it guarantees the clone exists before `sync` pulls, and is a harmless no-op for `update` (which only touches the binary).
 
 ### Versioning
 
@@ -43,7 +45,7 @@ The binary knows its own version via **ldflags injection** — `cli/internal/ver
 
 - `release-please.yml` (on push to `main`) maintains a release PR — changelog + next version derived from conventional commits — authored with the **`RELEASE_PLEASE_TOKEN`** PAT. Merging the PR tags + cuts a GitHub Release.
 - `upload-binary-to-release.yml` (on `release: published`) runs `make release VERSION=<tag>` to cross-compile `bootstrap-darwin-arm64` (the `VERSION=` override stamps the exact release tag) and attaches it. The PAT is what lets the release event trigger this second workflow.
-- To ship: push conventional commits → merge the release PR (rebase). `feat:`/`fix:` drive a release; **content-only changes** (dotfiles, Brewfile) use `chore:`/`docs:` so they propagate via `update`'s `git pull` without cutting a needless new binary.
+- To ship: push conventional commits → merge the release PR (rebase). `feat:`/`fix:` drive a release; **content-only changes** (dotfiles, Brewfile, macOS settings) use `chore:`/`docs:` so they propagate via `sync`'s `git pull` without cutting a needless new binary.
 
 ---
 
@@ -53,7 +55,7 @@ The binary knows its own version via **ldflags injection** — `cli/internal/ver
 bootstrap.sh/
 ├── bootstrap.sh         # the curl one-liner: downloads + installs the binary
 ├── Brewfile             # consumed by `bootstrap install`
-├── Makefile             # build/run with the version stamped from git
+├── Makefile             # build, run, release, local install-dev tasks
 ├── macos/               # settings.yaml — consumed by `bootstrap macos`
 ├── dotfiles/            # consumed by `bootstrap dotfiles` (ghostty, git, starship, zsh)
 ├── .github/workflows/   # release-please.yml + upload-binary-to-release.yml
@@ -64,9 +66,9 @@ bootstrap.sh/
     └── internal/
         ├── version.go   # package internal: var Version (ldflags-injected)
         ├── config/      # embedded default_config.yaml + loader
-        ├── jobs/        # one file per job: preflight, install, dotfiles, macos, update  (logic layer)
+        ├── jobs/        # one file per job: preflight, install, dotfiles, macos, update, sync  (logic layer)
         ├── ui/          # banner + styled logging
-        └── utils/       # dry-run-aware shell-out runner, fs/symlink/exec helpers
+        └── utils/       # dry-run-aware shell-out runner, fs/symlink/exec/yaml helpers
 ```
 
 `cmd/` is the *interface* layer (Cobra); `internal/jobs/` is the *logic* layer — same shape as API endpoint ↔ service.
@@ -103,21 +105,24 @@ The dot prefix carries the intent — no metadata files. The walk skips non-dire
 bootstrap install     # install packages from Brewfile
 bootstrap dotfiles    # symlink dotfiles into $HOME / XDG
 bootstrap macos       # apply macOS preferences
-bootstrap update      # update the binary (version-checked) + pull latest content
+bootstrap update      # update the binary to the latest release
+bootstrap sync        # pull the latest content from the repo
 bootstrap --version   # print the version
 --dry-run / -d        # global flag: print what would happen, change nothing
 ```
 
-Bare `bootstrap` prints Cobra's help — **by design**. There is intentionally no run-all entry point; each job is invoked explicitly.
+Bare `bootstrap` prints Cobra's help — **by design**. Every job is **atomic and order-independent** — run any one on its own, in any order — so there's intentionally no run-all entry point and no prescribed sequence; each job is invoked explicitly.
 
 ---
 
 ## Build & development
 
-`go.mod` lives in `cli/`, so build/run from there — or use the Makefile, which stamps the version from `git describe` (otherwise local builds show `dev`):
+`go.mod` lives in `cli/`, so build/run from there — or use the Makefile, which stamps the version from `git describe` (a plain `go build`, or `make install-dev`, shows `dev`):
 
 ```sh
 make build               # → bin/bootstrap, version stamped
+make install-dev         # build (stamped `dev`) + install to /usr/local/bin/bootstrap
+make uninstall-dev       # remove the local install
 make run ARGS="macos -d" # run from source with the version stamped
 cd cli && go build ./... # plain compile check
 ```
@@ -130,12 +135,11 @@ cd cli && go build ./... # plain compile check
 
 Not built yet — a rough backlog, unordered within each group.
 
-**Split `update`, add a version pin** (agreed direction)
-- Split `update` in two: `bootstrap update` = the binary only (self-update); `bootstrap sync` = the content (stash-aware `git pull` on the clone). They're independent — different cadences, no shared state — so bundling them was only convenience.
-- Add a version specifier to `update` for pin/rollback: `bootstrap update --version <tag>` (or `-v`), fetching the stable `releases/download/<tag>/bootstrap-darwin-arm64` asset. Allow a downgrade with confirmation; keep the semver "newer only" guard on the no-arg path. ⚠️ `--version` is already the global flag (prints the build version), so this likely needs a different name (`--tag` / `--pin`) or careful scoping. `bootstrap.sh` could honour a `BOOTSTRAP_VERSION` env for the same pin at install time.
+**Version select / rollback for `update`** (agreed direction)
+- Add `bootstrap update --tag <tag>` / `-t <tag>` to install a specific release, fetching the stable `releases/download/<tag>/bootstrap-darwin-arm64` asset; allow a downgrade with confirmation, keep the semver "newer only" guard on the no-arg path. `--tag`/`-t` sidesteps the global `--version`/`-v` (which prints the build version). Must run atomically, like every job.
 
-**Reversibility**
-- `bootstrap dotfiles --undo` / `-u` — reverse the symlinks, restore originals from `~/.dotfiles-backup`. Also makes lifecycle testing trivial.
+**Reversibility** (agreed direction)
+- `bootstrap dotfiles --undo` / `-u` — reverse the symlinks and restore originals from the latest `~/.dotfiles-backup/<timestamp>/`. The backup mirrors each file's `$HOME`-relative path, so the restore is a clean inverse walk. Must run atomically, like every job. Also makes lifecycle testing trivial.
 
 **UX polish** (vague, low priority)
 - Replace some raw stdout (`git pull`, `brew bundle`, the binary download) with loaders / spinners / progress — no specifics yet, just "might be nicer." If pursued: gate behind `term.IsTerminal`, and don't let a spinner swallow the sudo prompt.
