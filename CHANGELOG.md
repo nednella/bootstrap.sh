@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/nednella/bootstrap.sh/compare/v1.3.0...v1.3.1) (2026-06-04)
+
+
+### Bug Fixes
+
+* restrict the banner to job commands ([ef35f28](https://github.com/nednella/bootstrap.sh/commit/ef35f28a65471f8b475f6586531a29e632da2bdb))
+
 ## [1.3.0](https://github.com/nednella/bootstrap.sh/compare/v1.2.0...v1.3.0) (2026-06-04)
 
 
