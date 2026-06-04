@@ -17,7 +17,7 @@ const (
 	binaryAsset = "bootstrap-darwin-arm64"
 )
 
-func Update() error {
+func Update() (err error) {
 	if internal.Version == "dev" {
 		ui.Info("Skipping self-update (development build)")
 		return nil
@@ -45,6 +45,11 @@ func Update() error {
 	ui.Info("Updating binary " + internal.Version + " → " + latest + " (requires sudo) ...")
 	url := cfg.RepoURL + "/releases/latest/download/" + binaryAsset
 	staged := binaryDest + ".new"
+	defer func() {
+		if err != nil {
+			_ = utils.Command("sudo", "rm", "-f", staged)
+		}
+	}()
 
 	err = utils.PromptSudo()
 	if err != nil {
