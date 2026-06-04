@@ -17,6 +17,11 @@ const (
 )
 
 func Update() error {
+	if internal.Version == "dev" {
+		ui.Info("Skipping self-update (development build)")
+		return nil
+	}
+
 	cfg, err := config.Load()
 	if err != nil {
 		return err
