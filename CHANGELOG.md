@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/nednella/bootstrap.sh/compare/v1.1.1...v1.2.0) (2026-06-04)
+
+
+### Features
+
+* externalise macOS defaults to runtime settings.yaml ([d69fe84](https://github.com/nednella/bootstrap.sh/commit/d69fe84a78f4bc42e2037a3945e2b9964eb54e60))
+
 ## [1.1.1](https://github.com/nednella/bootstrap.sh/compare/v1.1.0...v1.1.1) (2026-06-03)
 
 
