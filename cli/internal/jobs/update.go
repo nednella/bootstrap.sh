@@ -2,6 +2,7 @@ package jobs
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/nednella/bootstrap.sh/internal"
@@ -30,6 +31,10 @@ func Update() error {
 	latest, err := latestVersion(cfg.RepoURL)
 	if err != nil {
 		return err
+	}
+
+	if !semver.IsValid(latest) {
+		return fmt.Errorf("unexpected release tag: %s", latest)
 	}
 
 	if semver.Compare(internal.Version, latest) >= 0 {
