@@ -24,7 +24,7 @@ Every **job command** runs `preflight` first (root `PersistentPreRun`, gated to 
 
 - `bootstrap install` — `brew bundle` against `<clone>/Brewfile`.
 - `bootstrap dotfiles` — symlink `<clone>/dotfiles/` into `$HOME` / `$XDG_CONFIG_HOME` (existing files backed up to `~/.dotfiles-backup/<timestamp>/` first).
-- `bootstrap macos` — apply macOS `defaults`.
+- `bootstrap macos` — apply macOS `defaults` read from `<clone>/macos/settings.yaml`.
 
 Symlinks point into the clone, so editing a config file writes through to the repo — commit + push upstream with normal git from `~/.bootstrap.sh`.
 
@@ -54,6 +54,7 @@ bootstrap.sh/
 ├── bootstrap.sh         # the curl one-liner: downloads + installs the binary
 ├── Brewfile             # consumed by `bootstrap install`
 ├── Makefile             # build/run with the version stamped from git
+├── macos/               # settings.yaml — consumed by `bootstrap macos`
 ├── dotfiles/            # consumed by `bootstrap dotfiles` (ghostty, git, starship, zsh)
 ├── .github/workflows/   # release-please.yml + upload-binary-to-release.yml
 ├── CLAUDE.md  README.md  CHANGELOG.md
@@ -136,9 +137,6 @@ Not built yet — a rough backlog, unordered within each group.
 **Reversibility**
 - `bootstrap dotfiles --undo` / `-u` — reverse the symlinks, restore originals from `~/.dotfiles-backup`. Also makes lifecycle testing trivial.
 
-**Externalise macOS defaults** (TODO — removes real friction)
-- Settings live *inside the binary* today (`macosDefault` structs in `cli/internal/jobs/macos.go`), so tweaking one needs a `feat:`/`fix:` and a whole new binary release. Move them out into repo *content* — a data file in the clone (e.g. `macos/defaults.yaml`) the binary reads at runtime — so edits propagate via content `sync` with no binary bump, exactly like the Brewfile and dotfiles already do. Caveat: the file format couples to the binary's parser, so a brand-new setting *type* could still need a binary change; adding/removing individual settings wouldn't.
-
 **UX polish** (vague, low priority)
 - Replace some raw stdout (`git pull`, `brew bundle`, the binary download) with loaders / spinners / progress — no specifics yet, just "might be nicer." If pursued: gate behind `term.IsTerminal`, and don't let a spinner swallow the sudo prompt.
 
@@ -169,7 +167,7 @@ A function called by a neighbouring function — a helper in a local call chain 
 Standard Go: exported `PascalCase`, unexported `camelCase`, initialisms all-caps (`URL`, `ID`, `HTTP`). Never export a helper purely so another package can reach it — that breaks the casing consistency of its sibling helpers. Route the cross-package call through the package's public entry point instead.
 
 ### Comments
-Code should be self-descriptive — comments shouldn't be needed. Don't write doc or inline comments; reach for clearer names instead. Compiler/tooling directives (`//go:embed`, release-please markers) are not comments and stay.
+Code should be self-descriptive — reach for clearer names before a comment. Skip comments that restate what the code already says. Keep load-bearing comments that explain non-obvious behaviour, ordering, or *why* a decision was made — something no name can carry (see the `//go:embed` note in `cli/internal/config/config.go`). Compiler/tooling directives (`//go:embed`, release-please markers) are not comments and stay.
 
 ### Style var naming
 Prefix style vars with the feature that consumes them: `headerArrowStyle`, not `arrowStyle`.
