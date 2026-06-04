@@ -6,13 +6,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var updateCmd = &cobra.Command{
-	Use:     "update",
-	Short:   "Update the binary to the latest release",
+var syncCmd = &cobra.Command{
+	Use:     "sync",
+	Short:   "Pull the latest changes from the remote repository",
 	GroupID: jobsGroupID,
 	Run: func(cmd *cobra.Command, args []string) {
-		ui.Header("update")
-		err := jobs.Update()
+		ui.Header("sync")
+		err := jobs.Sync()
 		if err != nil {
 			ui.Die(err.Error())
 		}
@@ -20,5 +20,5 @@ var updateCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(updateCmd)
+	rootCmd.AddCommand(syncCmd)
 }

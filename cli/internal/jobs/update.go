@@ -22,32 +22,18 @@ func Update() error {
 		return err
 	}
 
-	err = updateBinary(cfg.RepoURL)
-	if err != nil {
-		return err
-	}
-	err = updateContent(cfg.InstallPath)
-	if err != nil {
-		return err
-	}
-
-	ui.Success("Updated")
-	return nil
-}
-
-func updateBinary(repoURL string) error {
-	latest, err := latestVersion(repoURL)
+	latest, err := latestVersion(cfg.RepoURL)
 	if err != nil {
 		return err
 	}
 
 	if semver.Compare(internal.Version, latest) >= 0 {
-		ui.Info("Binary — up to date (" + internal.Version + ")")
+		ui.Info("Already up to date (" + internal.Version + ")")
 		return nil
 	}
 
-	ui.Info("Binary — updating " + internal.Version + " → " + latest + " (sudo) ...")
-	url := repoURL + "/releases/latest/download/" + binaryAsset
+	ui.Info("Updating binary " + internal.Version + " → " + latest + " (sudo) ...")
+	url := cfg.RepoURL + "/releases/latest/download/" + binaryAsset
 	staged := binaryDest + ".new"
 
 	err = utils.PromptSudo()
@@ -62,7 +48,13 @@ func updateBinary(repoURL string) error {
 	if err != nil {
 		return err
 	}
-	return utils.Command("sudo", "mv", staged, binaryDest)
+	err = utils.Command("sudo", "mv", staged, binaryDest)
+	if err != nil {
+		return err
+	}
+
+	ui.Success("Updated → " + latest)
+	return nil
 }
 
 func latestVersion(repoURL string) (string, error) {
@@ -76,39 +68,4 @@ func latestVersion(repoURL string) (string, error) {
 	}
 	err = json.Unmarshal([]byte(out), &release)
 	return release.TagName, err
-}
-
-func updateContent(clone string) error {
-	dirty, err := isDirty(clone)
-	if err != nil {
-		return err
-	}
-
-	if dirty {
-		ui.Info("Content — stashing local changes ...")
-		err = utils.Command("git", "-C", clone, "stash", "push", "-u")
-		if err != nil {
-			return err
-		}
-	}
-
-	ui.Info("Content — pulling latest ...")
-	err = utils.Command("git", "-C", clone, "pull")
-	if err != nil {
-		return err
-	}
-
-	if dirty {
-		ui.Info("Content — restoring local changes ...")
-		return utils.Command("git", "-C", clone, "stash", "pop")
-	}
-	return nil
-}
-
-func isDirty(clone string) (bool, error) {
-	if utils.DryRun {
-		return false, nil
-	}
-	out, err := utils.Output("git", "-C", clone, "status", "--porcelain")
-	return out != "", err
 }
