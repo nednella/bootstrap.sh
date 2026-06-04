@@ -48,6 +48,7 @@ func Update() error {
 	if err != nil {
 		return err
 	}
+	_ = utils.Command("sudo", "xattr", "-d", "com.apple.quarantine", staged)
 	err = utils.Command("sudo", "mv", staged, binaryDest)
 	if err != nil {
 		return err
