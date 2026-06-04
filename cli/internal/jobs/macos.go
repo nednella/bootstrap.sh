@@ -60,6 +60,9 @@ func closeSystemSettings() {
 }
 
 func applyDefault(d macosDefault) error {
+	if d.Domain == "" || d.Key == "" || d.ValueType == "" {
+		return fmt.Errorf("incomplete macOS setting, domain/key/value_type all required: %+v", d)
+	}
 	ui.Info(d.Domain + " " + d.Key + " → " + d.Value)
 	args := []string{"write", d.Domain, d.Key, "-" + d.ValueType, d.Value}
 	if d.CurrentHost {
