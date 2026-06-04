@@ -3,6 +3,7 @@ package jobs
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/nednella/bootstrap.sh/internal/config"
 	"github.com/nednella/bootstrap.sh/internal/ui"
@@ -72,7 +73,7 @@ func applyDefault(d macosDefault) error {
 }
 
 func restartServices(services []string) {
-	ui.Info("Restarting services ...")
+	ui.Info("Restarting services (" + strings.Join(services, ", ") + ") ...")
 	for _, app := range services {
 		_ = utils.Command("killall", app)
 	}
