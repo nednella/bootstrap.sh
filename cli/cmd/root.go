@@ -23,14 +23,14 @@ Installs Homebrew + Brewfile, symlinks dotfiles into $HOME, and applies macOS pr
 	Version: internal.Version,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		utils.DryRun = dryRun
+		if cmd.GroupID != jobsGroupID {
+			return
+		}
+
 		ui.Banner()
 		if dryRun {
 			fmt.Println()
 			ui.Warn("DRY RUN — no changes will be made")
-		}
-
-		if cmd.GroupID != jobsGroupID {
-			return
 		}
 
 		err := jobs.Preflight()
