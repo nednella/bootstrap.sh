@@ -37,7 +37,7 @@ func MacOS() error {
 	settings := &macosSettings{}
 	err = utils.LoadYAML(path, settings)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to parse %s: %w", path, err)
 	}
 
 	closeSystemSettings()
