@@ -12,42 +12,12 @@ func Sync() error {
 		return err
 	}
 
-	clone := cfg.InstallPath
-	dirty, err := isDirty(clone)
-	if err != nil {
-		return err
-	}
-
-	if dirty {
-		ui.Info("Stashing local changes ...")
-		err = utils.Command("git", "-C", clone, "stash", "push", "-u")
-		if err != nil {
-			return err
-		}
-	}
-
 	ui.Info("Pulling latest changes ...")
-	err = utils.Command("git", "-C", clone, "pull")
+	err = utils.Command("git", "-C", cfg.InstallPath, "pull", "--rebase", "--autostash")
 	if err != nil {
 		return err
-	}
-
-	if dirty {
-		ui.Info("Restoring local changes ...")
-		err = utils.Command("git", "-C", clone, "stash", "pop")
-		if err != nil {
-			return err
-		}
 	}
 
 	ui.Success("Synced")
 	return nil
-}
-
-func isDirty(clone string) (bool, error) {
-	if utils.DryRun {
-		return false, nil
-	}
-	out, err := utils.Output("git", "-C", clone, "status", "--porcelain")
-	return out != "", err
 }
