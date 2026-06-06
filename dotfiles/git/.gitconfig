@@ -1,7 +1,3 @@
-# ==============================================================================
-# .gitconfig
-# ==============================================================================
-
 [user]
 	name			= nednella
 	email 			= 119449811+nednella@users.noreply.github.com 
@@ -91,13 +87,13 @@
 	uncommit		= reset --mixed HEAD~1
 
 	# stash shortcuts
-	sl				= stash list
-	sa				= stash --include-untracked
-	sp				= stash pop
+	stl				= stash list
+	sta				= stash --include-untracked
+	stp				= stash pop
 
 	# log
-	l				= log --oneline --graph --decorate -20
-	lg				= log --graph --pretty=format:'%C(yellow)%h%Creset %C(cyan)%an%Creset %s %C(green)(%cr)%Creset' --abbrev-commit
+	lg				= log --oneline --graph --decorate -20
+	lgp				= log --graph --pretty=format:'%C(yellow)%h%Creset %C(cyan)%an%Creset %s %C(green)(%cr)%Creset' --abbrev-commit
 	last			= log -1 HEAD --stat
 	who				= shortlog -sne
 
