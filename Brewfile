@@ -1,6 +1,8 @@
 brew "git"
 brew "gh"
 brew "starship"
+brew "zsh-autosuggestions"
+brew "zsh-syntax-highlighting"
 brew "neovim"
 brew "nvm"
 brew "uv"

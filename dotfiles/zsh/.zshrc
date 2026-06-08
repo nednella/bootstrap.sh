@@ -20,8 +20,6 @@ setopt HIST_IGNORE_DUPS
 setopt HIST_REDUCE_BLANKS
 setopt SHARE_HISTORY
 
-autoload -Uz compinit && compinit
-
 alias path='echo $PATH | tr ":" "\n"'
 alias reload!='source ~/.zshrc'
 
@@ -31,3 +29,10 @@ take() {
 
 eval "$(fnm env --use-on-cd --shell zsh)"
 eval "$(starship init zsh)"
+
+source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+bindkey '^I' autosuggest-accept   # Tab accepts the grey suggestion
+bindkey '^[[Z' undo               # Shift+Tab undoes the accept (zsh undo)
+
+# must be sourced last — it hooks the line editor
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
