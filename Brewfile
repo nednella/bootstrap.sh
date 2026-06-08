@@ -1,5 +1,6 @@
 brew "git"
 brew "gh"
+brew "starship"
 brew "neovim"
 brew "nvm"
 brew "uv"

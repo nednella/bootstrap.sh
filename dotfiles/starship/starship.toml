@@ -1,0 +1,82 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+$directory\
+$git_branch\
+$git_status\
+$git_state\
+$fill\
+$cmd_duration\
+$golang\
+$nodejs\
+$python\
+$line_break\
+$character"""
+
+palette = "custom"
+
+[palettes.custom]
+git_conflict  = "#ff7a9c"  # pink   (conflict)
+git_deleted   = "#ff6363"  # red    (deleted)
+git_modified  = "#ffd95c"  # amber  (modified)
+git_staged    = "#3dff6a"  # green  (added/staged)
+git_sync      = "#5cc8ff"  # blue   (stashed/ahead/behind)
+git_untracked = "#4dffb8"  # mint   (untracked)
+neon_cyan     = "#00ffff"
+neon_green    = "#39ff14"
+neon_pink     = "#ff007f"
+neon_yellow   = "#ffff00"
+
+[directory]
+format = '[ $path]($style) '
+truncate_to_repo = false
+truncation_length = 4
+truncation_symbol = ".../"
+
+[git_status]
+format = '([$staged$modified$untracked$deleted$conflicted$stashed$ahead_behind]($style) )'
+ahead      = '[⇡${count} ](git_sync)'
+behind     = '[⇣${count} ](git_sync)'
+conflicted = '[C${count} ](git_conflict)'
+deleted    = '[D${count} ](git_deleted)'
+diverged   = '[⇕⇡${ahead_count}⇣${behind_count} ](git_sync)'
+modified   = '[M${count} ](git_modified)'
+staged     = '[S${count} ](git_staged)'
+stashed    = '[≡${count} ](git_sync)'
+untracked  = '[U${count} ](git_untracked)'
+
+[git_state]
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+style = "bold neon_pink"
+
+[fill]
+symbol = " "
+
+[golang]
+format = '[$symbol($version )]($style)'
+style = "bold neon_cyan"
+symbol = " "
+version_format = "${raw}"
+
+[nodejs]
+format = '[$symbol($version )]($style)'
+style = "bold neon_green"
+symbol = "󰎙 "
+version_format = "${raw}"
+
+[python]
+format = '[$symbol($version )]($style)'
+style = "bold neon_yellow"
+symbol = " "
+version_format = "${raw}"
+
+[cmd_duration]
+format = '[ $duration]($style) '
+min_time = 2_000
+style = "bold neon_yellow"
+
+[character]
+error_symbol = "[❯](bold red)"
+success_symbol = "[❯](bold neon_green)"
+vimcmd_symbol = "[❮](bold neon_yellow)"
