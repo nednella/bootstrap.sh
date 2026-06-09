@@ -5,12 +5,19 @@ export EDITOR='code --new-window --wait'
 export VISUAL=$EDITOR
 
 export XDG_CONFIG_HOME="$HOME/.config"
+export CODE="$HOME/code"
 export PATH="$HOME/.local/bin:$PATH"
 
-export STARSHIP_CONFIG="$XDG_CONFIG_HOME/starship/starship.toml"
-
-export UPSCOPE_DIR="$HOME/dev/upscope"
+# Upscope
+export UPSCOPE_DIR="$CODE/upscope"
 export PATH="$PATH:$UPSCOPE_DIR/bin"
+
+# Go
+export GOPATH="$HOME/.local/share/go"
+export GOBIN="$HOME/.local/bin"
+
+# starship
+export STARSHIP_CONFIG="$XDG_CONFIG_HOME/starship/starship.toml"
 
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=20000
