@@ -46,6 +46,39 @@ func Dotfiles() error {
 	return nil
 }
 
+func DotfilesUndo() error {
+	cfg, err := config.Load()
+	if err != nil {
+		return err
+	}
+
+	dotfilesDir := filepath.Join(cfg.InstallPath, "dotfiles")
+	if !utils.Exists(dotfilesDir) {
+		return fmt.Errorf("dotfiles directory not found: %s", dotfilesDir)
+	}
+
+	backupDir := latestBackup(cfg.BackupPath)
+
+	programs, err := os.ReadDir(dotfilesDir)
+	if err != nil {
+		return err
+	}
+
+	for _, program := range programs {
+		if !program.IsDir() {
+			continue
+		}
+		err := unlinkProgram(filepath.Join(dotfilesDir, program.Name()), program.Name(), backupDir)
+		if err != nil {
+			return err
+		}
+	}
+
+	ui.Success("Dotfiles unlinked")
+	return nil
+}
+
+
 func linkProgram(programDir, programName, backupDir string) error {
 	entries, err := os.ReadDir(programDir)
 	if err != nil {
@@ -56,6 +89,23 @@ func linkProgram(programDir, programName, backupDir string) error {
 		src := filepath.Join(programDir, entry.Name())
 		target := resolveTarget(entry.Name(), programName)
 		err := link(src, target, backupDir)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func unlinkProgram(programDir, programName, backupDir string) error {
+	entries, err := os.ReadDir(programDir)
+	if err != nil {
+		return err
+	}
+
+	for _, entry := range entries {
+		src := filepath.Join(programDir, entry.Name())
+		target := resolveTarget(entry.Name(), programName)
+		err := unlink(src, target, backupDir)
 		if err != nil {
 			return err
 		}
@@ -133,5 +183,52 @@ func backupAndLink(src, target, backupDir, name string) error {
 		return err
 	}
 	ui.Info(name + " — linked")
+	return nil
+}
+
+// return the latest backup directory, or "" if none
+func latestBackup(backupPath string) string {
+	entries, err := os.ReadDir(backupPath)
+	if err != nil {
+		return ""
+	}
+
+	latest := ""
+	for _, entry := range entries {
+		if entry.IsDir() && entry.Name() > latest {
+			latest = entry.Name()
+		}
+	}
+	if latest == "" {
+		return ""
+	}
+	return filepath.Join(backupPath, latest)
+}
+
+
+func unlink(src, target, backupDir string) error {
+	name := utils.DisplayName(target)
+
+	if !utils.IsSymlinkedTo(target, src) {
+		ui.Info(name + " — not linked")
+		return nil
+	}
+
+	err := utils.Remove(target)
+	if err != nil {
+		return err
+	}
+	ui.Info(name + " — unlinked")
+
+	backup := filepath.Join(backupDir, name)
+	if backupDir == "" || !utils.Exists(backup) {
+		return nil
+	}
+
+	err = utils.Rename(backup, target)
+	if err != nil {
+		return err
+	}
+	ui.Info(name + " — restored from " + backupDir)
 	return nil
 }

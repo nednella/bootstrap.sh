@@ -23,7 +23,7 @@ curl -fsSL https://raw.githubusercontent.com/nednella/bootstrap.sh/main/bootstra
 Every **job command** runs `preflight` first (root `PersistentPreRun`, gated to job commands by Cobra `GroupID`). Preflight ensures — silently, acting only on what's missing — Homebrew → git → the repo clone at `~/.bootstrap.sh`. Then the job runs against that clone:
 
 - `bootstrap install` — `brew bundle` against `<clone>/Brewfile`.
-- `bootstrap dotfiles` — symlink `<clone>/dotfiles/` into `$HOME` / `$XDG_CONFIG_HOME` (existing files backed up to `~/.dotfiles-backup/<timestamp>/` first).
+- `bootstrap dotfiles` — symlink `<clone>/dotfiles/` into `$HOME` / `$XDG_CONFIG_HOME` (existing files backed up to `~/.dotfiles-backup/<timestamp>/` first). `--undo` / `-u` reverses it: targets symlinked into the clone are removed, then originals restored from the latest backup (the backup mirrors each file's `$HOME`-relative path, so the restore is a clean inverse walk).
 - `bootstrap macos` — apply macOS `defaults` read from `<clone>/macos/settings.yaml`.
 - `bootstrap ssh-key` — generate an ed25519 SSH key (comment = `git config user.email`, which it requires) and copy the public key to the clipboard via `pbcopy`. Git/GitHub-specific, not a generic keygen.
 
@@ -105,6 +105,7 @@ The dot prefix carries the intent — no metadata files. The walk skips non-dire
 ```
 bootstrap install             # install packages from Brewfile
 bootstrap dotfiles            # symlink dotfiles into $HOME / XDG
+bootstrap dotfiles --undo     # unlink dotfiles and restore the latest backup
 bootstrap macos               # apply macOS preferences
 bootstrap ssh-key             # generate an SSH key and copy it to the clipboard
 bootstrap update              # update the binary to the latest release
@@ -138,9 +139,6 @@ cd cli && go build ./... # plain compile check
 ## Ideas (future work)
 
 Not built yet — a rough backlog, unordered within each group.
-
-**Reversibility** (agreed direction)
-- `bootstrap dotfiles --undo` / `-u` — reverse the symlinks and restore originals from the latest `~/.dotfiles-backup/<timestamp>/`. The backup mirrors each file's `$HOME`-relative path, so the restore is a clean inverse walk. Must run atomically, like every job. Also makes lifecycle testing trivial.
 
 **UX polish** (vague, low priority)
 - Replace some raw stdout (`git pull`, `brew bundle`, the binary download) with loaders / spinners / progress — no specifics yet, just "might be nicer." If pursued: gate behind `term.IsTerminal`, and don't let a spinner swallow the sudo prompt.

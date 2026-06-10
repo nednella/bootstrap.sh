@@ -25,6 +25,7 @@ curl -fsSL https://raw.githubusercontent.com/nednella/bootstrap.sh/main/bootstra
 ```sh
 bootstrap                     # show help and all available commands
 bootstrap dotfiles            # symlink dotfiles into $HOME / XDG
+bootstrap dotfiles --undo     # unlink dotfiles and restore the latest backup
 bootstrap install             # install packages from Brewfile
 bootstrap macos               # apply macOS preferences
 bootstrap ssh-key             # generate an SSH key and copy it to the clipboard
