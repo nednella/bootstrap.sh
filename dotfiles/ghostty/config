@@ -28,3 +28,7 @@ copy-on-select = clipboard
 macos-option-as-alt = true
 mouse-hide-while-typing = true
 macos-auto-secure-input = true
+
+keybind = cmd+r=new_split:right
+keybind = cmd+d=new_split:down
+keybind = cmd+w=close_surface
