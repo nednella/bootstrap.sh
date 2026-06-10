@@ -79,7 +79,7 @@
 	cm				= commit -m
 	amend			= commit --amend --no-edit
 	reword			= commit --amend
-	wip				= !git add -A && git commit -m \"chore: WIP\"
+	wip				= !git add -A && git commit -m \"chore: wip\"
 
 	# undo / fixup
 	unstage			= reset HEAD --
