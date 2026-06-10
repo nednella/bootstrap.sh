@@ -44,27 +44,7 @@ func Update() (err error) {
 
 	ui.Info("Updating binary " + internal.Version + " → " + latest + " (requires sudo) ...")
 	url := cfg.RepoURL + "/releases/latest/download/" + binaryAsset
-	staged := binaryDest + ".new"
-	defer func() {
-		if err != nil {
-			_ = utils.Command("sudo", "rm", "-f", staged)
-		}
-	}()
-
-	err = utils.PromptSudo()
-	if err != nil {
-		return err
-	}
-	err = utils.Command("sudo", "curl", "-fL", url, "-o", staged)
-	if err != nil {
-		return err
-	}
-	err = utils.Command("sudo", "chmod", "+x", staged)
-	if err != nil {
-		return err
-	}
-	_ = utils.Command("sudo", "xattr", "-d", "com.apple.quarantine", staged)
-	err = utils.Command("sudo", "mv", staged, binaryDest)
+	err = replaceBinary(url, binaryDest)
 	if err != nil {
 		return err
 	}
@@ -84,4 +64,31 @@ func latestVersion(repoURL string) (string, error) {
 	}
 	err = json.Unmarshal([]byte(out), &release)
 	return release.TagName, err
+}
+
+// replaceBinary downloads url to a staged path and atomically moves it over dest,
+// removing the staged file if any step fails. Every step needs sudo because dest
+// lives in a system directory.
+func replaceBinary(url, dest string) (err error) {
+	staged := dest + ".new"
+	defer func() {
+		if err != nil {
+			_ = utils.Command("sudo", "rm", "-f", staged)
+		}
+	}()
+
+	err = utils.PromptSudo()
+	if err != nil {
+		return err
+	}
+	err = utils.Command("sudo", "curl", "-fL", url, "-o", staged)
+	if err != nil {
+		return err
+	}
+	err = utils.Command("sudo", "chmod", "+x", staged)
+	if err != nil {
+		return err
+	}
+	_ = utils.Command("sudo", "xattr", "-d", "com.apple.quarantine", staged)
+	return utils.Command("sudo", "mv", staged, dest)
 }
