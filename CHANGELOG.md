@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/nednella/bootstrap.sh/compare/v1.5.0...v1.5.1) (2026-06-10)
+
+
+### Bug Fixes
+
+* pin update download URL to the resolved release tag ([eb96138](https://github.com/nednella/bootstrap.sh/commit/eb96138f59900fbd95410a7188db79a6b11898fd))
+
 ## [1.5.0](https://github.com/nednella/bootstrap.sh/compare/v1.4.0...v1.5.0) (2026-06-10)
 
 
