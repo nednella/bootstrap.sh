@@ -53,6 +53,36 @@ func Update() (err error) {
 	return nil
 }
 
+func UpdateTag(tag string) error {
+	if !semver.IsValid(tag) {
+		return fmt.Errorf("invalid release tag: %s", tag)
+	}
+
+	cfg, err := config.Load()
+	if err != nil {
+		return err
+	}
+
+	downgrade := semver.IsValid(internal.Version) && semver.Compare(tag, internal.Version) < 0
+	if downgrade && !utils.DryRun {
+		ok := utils.Confirm("Downgrade " + internal.Version + " → " + tag + "?")
+		if !ok {
+			ui.Info("Cancelled")
+			return nil
+		}
+	}
+
+	ui.Info("Installing binary " + tag + " (requires sudo) ...")
+	url := cfg.RepoURL + "/releases/download/" + tag + "/" + binaryAsset
+	err = replaceBinary(url, binaryDest)
+	if err != nil {
+		return err
+	}
+
+	ui.Success("Installed → " + tag)
+	return nil
+}
+
 func UpdateList() error {
 	cfg, err := config.Load()
 	if err != nil {

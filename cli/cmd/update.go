@@ -6,7 +6,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var updateList bool
+var (
+	updateTag  string
+	updateList bool
+)
 
 var updateCmd = &cobra.Command{
 	Use:     "update",
@@ -18,6 +21,8 @@ var updateCmd = &cobra.Command{
 		switch {
 		case updateList:
 			err = jobs.UpdateList()
+		case updateTag != "":
+			err = jobs.UpdateTag(updateTag)
 		default:
 			err = jobs.Update()
 		}
@@ -28,6 +33,8 @@ var updateCmd = &cobra.Command{
 }
 
 func init() {
+	updateCmd.Flags().StringVarP(&updateTag, "tag", "t", "", "install a specific release")
 	updateCmd.Flags().BoolVarP(&updateList, "list", "l", false, "list available releases")
+	updateCmd.MarkFlagsMutuallyExclusive("tag", "list")
 	rootCmd.AddCommand(updateCmd)
 }
