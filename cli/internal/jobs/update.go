@@ -3,7 +3,6 @@ package jobs
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/nednella/bootstrap.sh/internal"
 	"github.com/nednella/bootstrap.sh/internal/config"
@@ -43,7 +42,7 @@ func Update() (err error) {
 	}
 
 	ui.Info("Updating binary " + internal.Version + " → " + latest + " (requires sudo) ...")
-	url := cfg.RepoURL + "/releases/latest/download/" + binaryAsset
+	url := utils.ReleaseAssetURL(cfg.RepoURL, latest, binaryAsset)
 	err = replaceBinary(url, binaryDest)
 	if err != nil {
 		return err
@@ -73,7 +72,7 @@ func UpdateTag(tag string) error {
 	}
 
 	ui.Info("Installing binary " + tag + " (requires sudo) ...")
-	url := cfg.RepoURL + "/releases/download/" + tag + "/" + binaryAsset
+	url := utils.ReleaseAssetURL(cfg.RepoURL, tag, binaryAsset)
 	err = replaceBinary(url, binaryDest)
 	if err != nil {
 		return err
@@ -109,8 +108,7 @@ func UpdateList() error {
 }
 
 func getAvailableReleases(repoURL string) ([]string, error) {
-	api := strings.Replace(repoURL, "https://github.com/", "https://api.github.com/repos/", 1) + "/releases"
-	out, err := utils.Output("curl", "-fsSL", api)
+	out, err := utils.Output("curl", "-fsSL", utils.ReleasesAPIURL(repoURL))
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +129,7 @@ func getAvailableReleases(repoURL string) ([]string, error) {
 }
 
 func getLatestRelease(repoURL string) (string, error) {
-	api := strings.Replace(repoURL, "https://github.com/", "https://api.github.com/repos/", 1) + "/releases/latest"
+	api := utils.ReleasesAPIURL(repoURL) + "/latest"
 	out, err := utils.Output("curl", "-fsSL", api)
 	if err != nil {
 		return "", err
