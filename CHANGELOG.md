@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/nednella/bootstrap.sh/compare/v1.4.0...v1.5.0) (2026-06-10)
+
+
+### Features
+
+* add dotfiles --undo job ([3ba5f96](https://github.com/nednella/bootstrap.sh/commit/3ba5f962f731b6901f8b7b6bd1ec1761d84e5d4d))
+
 ## [1.4.0](https://github.com/nednella/bootstrap.sh/compare/v1.3.1...v1.4.0) (2026-06-10)
 
 
