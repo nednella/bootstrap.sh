@@ -53,12 +53,60 @@ func Update() (err error) {
 	return nil
 }
 
+func UpdateList() error {
+	cfg, err := config.Load()
+	if err != nil {
+		return err
+	}
+
+	releases, err := getAvailableReleases(cfg.RepoURL)
+	if err != nil {
+		return err
+	}
+	if len(releases) == 0 {
+		ui.Info("No releases found")
+		return nil
+	}
+
+	for _, release := range releases {
+		if release == internal.Version {
+			ui.Info(release + " (current)")
+			continue
+		}
+		ui.Info(release)
+	}
+	return nil
+}
+
+func getAvailableReleases(repoURL string) ([]string, error) {
+	api := strings.Replace(repoURL, "https://github.com/", "https://api.github.com/repos/", 1) + "/releases"
+	out, err := utils.Output("curl", "-fsSL", api)
+	if err != nil {
+		return nil, err
+	}
+
+	var releases []struct {
+		TagName string `json:"tag_name"`
+	}
+	err = json.Unmarshal([]byte(out), &releases)
+	if err != nil {
+		return nil, err
+	}
+
+	tags := make([]string, len(releases))
+	for i, release := range releases {
+		tags[i] = release.TagName
+	}
+	return tags, nil
+}
+
 func getLatestRelease(repoURL string) (string, error) {
 	api := strings.Replace(repoURL, "https://github.com/", "https://api.github.com/repos/", 1) + "/releases/latest"
 	out, err := utils.Output("curl", "-fsSL", api)
 	if err != nil {
 		return "", err
 	}
+
 	var release struct {
 		TagName string `json:"tag_name"`
 	}
