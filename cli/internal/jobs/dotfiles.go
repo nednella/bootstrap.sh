@@ -78,7 +78,6 @@ func DotfilesUndo() error {
 	return nil
 }
 
-
 func linkProgram(programDir, programName, backupDir string) error {
 	entries, err := os.ReadDir(programDir)
 	if err != nil {
@@ -204,7 +203,6 @@ func latestBackup(backupPath string) string {
 	}
 	return filepath.Join(backupPath, latest)
 }
-
 
 func unlink(src, target, backupDir string) error {
 	name := utils.DisplayName(target)

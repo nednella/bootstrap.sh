@@ -11,13 +11,13 @@ var (
 	headerStyle      = lipgloss.NewStyle().MarginTop(1).MarginBottom(1)
 	headerArrowStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("14")).Bold(true) // bright cyan
 	headerTitleStyle = lipgloss.NewStyle().Bold(true)
-	infoStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("12")).MarginLeft(2).Width(8) // bright blue
-	successStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("10")).MarginLeft(2).Width(8) // bright green
-	warnStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("11")).MarginLeft(2).Width(8) // bright yellow
-	errorStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("9")).MarginLeft(2).Width(8) // bright red
-	dryStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).MarginLeft(2).Width(8) // grey
-	sudoStyle    = lipgloss.NewStyle().Foreground(lipgloss.Color("13")).MarginLeft(2).Width(8) // bright magenta
-	dryBodyStyle = lipgloss.NewStyle().Faint(true)
+	infoStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("12")).MarginLeft(2).Width(8) // bright blue
+	successStyle     = lipgloss.NewStyle().Foreground(lipgloss.Color("10")).MarginLeft(2).Width(8) // bright green
+	warnStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("11")).MarginLeft(2).Width(8) // bright yellow
+	errorStyle       = lipgloss.NewStyle().Foreground(lipgloss.Color("9")).MarginLeft(2).Width(8)  // bright red
+	dryStyle         = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).MarginLeft(2).Width(8)  // grey
+	sudoStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("13")).MarginLeft(2).Width(8) // bright magenta
+	dryBodyStyle     = lipgloss.NewStyle().Faint(true)
 )
 
 func Die(msg string) {
