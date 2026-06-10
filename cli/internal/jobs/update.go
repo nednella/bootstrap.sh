@@ -28,7 +28,7 @@ func Update() (err error) {
 		return err
 	}
 
-	latest, err := latestVersion(cfg.RepoURL)
+	latest, err := getLatestRelease(cfg.RepoURL)
 	if err != nil {
 		return err
 	}
@@ -53,7 +53,7 @@ func Update() (err error) {
 	return nil
 }
 
-func latestVersion(repoURL string) (string, error) {
+func getLatestRelease(repoURL string) (string, error) {
 	api := strings.Replace(repoURL, "https://github.com/", "https://api.github.com/repos/", 1) + "/releases/latest"
 	out, err := utils.Output("curl", "-fsSL", api)
 	if err != nil {
