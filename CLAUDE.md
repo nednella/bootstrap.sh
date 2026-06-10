@@ -25,6 +25,7 @@ Every **job command** runs `preflight` first (root `PersistentPreRun`, gated to 
 - `bootstrap install` — `brew bundle` against `<clone>/Brewfile`.
 - `bootstrap dotfiles` — symlink `<clone>/dotfiles/` into `$HOME` / `$XDG_CONFIG_HOME` (existing files backed up to `~/.dotfiles-backup/<timestamp>/` first).
 - `bootstrap macos` — apply macOS `defaults` read from `<clone>/macos/settings.yaml`.
+- `bootstrap ssh-key` — generate an ed25519 SSH key (comment = `git config user.email`, which it requires) and copy the public key to the clipboard via `pbcopy`. Git/GitHub-specific, not a generic keygen.
 
 Symlinks point into the clone, so editing a config file writes through to the repo — commit + push upstream with normal git from `~/.bootstrap.sh`.
 
@@ -32,7 +33,7 @@ Symlinks point into the clone, so editing a config file writes through to the re
 
 Two independent maintenance commands — different cadences, no shared state:
 
-- `bootstrap update` — **binary only**. Fetch the latest release tag (GitHub API), `semver.Compare` it against the running binary's version; if newer, download + atomically replace `/usr/local/bin/bootstrap` (sudo, primed once via `PromptSudo`). If current, it's a no-op.
+- `bootstrap update` — **binary only**. Fetch the latest release tag (GitHub API), `semver.Compare` it against the running binary's version; if newer, download + atomically replace `/usr/local/bin/bootstrap` (sudo, primed once via `PromptSudo`). If current, it's a no-op. `--tag <tag>` / `-t` installs a specific release instead (downgrade confirmed via `utils.Confirm`, but no newer-only guard); `--list` / `-l` prints the available release tags, newest first, marking the current one. The shared download+swap is `replaceBinary`; `/releases/latest` (stable) feeds the no-arg path, `/releases` (all) feeds `--list`.
 - `bootstrap sync` — **content only**. `git pull --rebase --autostash` on the clone, so local dotfile edits are stashed, the pull replays on top, and they're restored — surviving the update.
 
 Both are job commands too, so `preflight` runs first — it guarantees the clone exists before `sync` pulls, and is a harmless no-op for `update` (which only touches the binary).
@@ -66,7 +67,7 @@ bootstrap.sh/
     └── internal/
         ├── version.go   # package internal: var Version (ldflags-injected)
         ├── config/      # embedded default_config.yaml + loader
-        ├── jobs/        # one file per job: preflight, install, dotfiles, macos, update, sync  (logic layer)
+        ├── jobs/        # one file per job: preflight, install, dotfiles, macos, sshkey, update, sync  (logic layer)
         ├── ui/          # banner + styled logging
         └── utils/       # dry-run-aware shell-out runner, fs/symlink/exec/yaml helpers
 ```
@@ -102,13 +103,16 @@ The dot prefix carries the intent — no metadata files. The walk skips non-dire
 ## Command surface
 
 ```
-bootstrap install     # install packages from Brewfile
-bootstrap dotfiles    # symlink dotfiles into $HOME / XDG
-bootstrap macos       # apply macOS preferences
-bootstrap update      # update the binary to the latest release
-bootstrap sync        # pull the latest content from the repo
-bootstrap --version   # print the version
---dry-run / -d        # global flag: print what would happen, change nothing
+bootstrap install             # install packages from Brewfile
+bootstrap dotfiles            # symlink dotfiles into $HOME / XDG
+bootstrap macos               # apply macOS preferences
+bootstrap ssh-key             # generate an SSH key and copy it to the clipboard
+bootstrap update              # update the binary to the latest release
+bootstrap update --list       # list available releases
+bootstrap update --tag <tag>  # install a specific release
+bootstrap sync                # pull the latest changes from the remote repository
+bootstrap --version           # print the version
+--dry-run / -d                # global flag: print what would happen, change nothing
 ```
 
 Bare `bootstrap` prints Cobra's help — **by design**. Every job is **atomic and order-independent** — run any one on its own, in any order — so there's intentionally no run-all entry point and no prescribed sequence; each job is invoked explicitly.
@@ -134,10 +138,6 @@ cd cli && go build ./... # plain compile check
 ## Ideas (future work)
 
 Not built yet — a rough backlog, unordered within each group.
-
-**Version select / rollback for `update`** (agreed direction — next up: `-t` then `-l`)
-- Add `bootstrap update --tag <tag>` / `-t <tag>` to install a specific release, fetching the stable `releases/download/<tag>/bootstrap-darwin-arm64` asset; allow a downgrade with confirmation, keep the semver "newer only" guard on the no-arg path. `--tag`/`-t` sidesteps the global `--version`/`-v` (which prints the build version). Must run atomically, like every job.
-- Add `bootstrap update --list` / `-l` to print the available release tags (GitHub Releases API), newest first, marking the current one. It's the menu that `--tag` selects from — same binary-release concern, so it lives on `update` rather than a standalone command (a read-only query has no place in a job-only surface). The three modes read as one command: bare (latest), `--tag` (specific), `--list` (show choices); `-t`/`-l` stay clear of the global `-v`. Still runs `preflight` as a silent no-op — preflight is gated flatly by job-command `GroupID`, never scoped per-flag, so there's no "does this need preflight?" judgement to forget.
 
 **Reversibility** (agreed direction)
 - `bootstrap dotfiles --undo` / `-u` — reverse the symlinks and restore originals from the latest `~/.dotfiles-backup/<timestamp>/`. The backup mirrors each file's `$HOME`-relative path, so the restore is a clean inverse walk. Must run atomically, like every job. Also makes lifecycle testing trivial.
