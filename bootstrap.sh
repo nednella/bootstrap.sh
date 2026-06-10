@@ -20,7 +20,6 @@ if ! curl -fL "$DOWNLOAD_URL" -o "$TMP_FILE"; then
 fi
 
 chmod +x "$TMP_FILE"
-xattr -d com.apple.quarantine "$TMP_FILE" 2>/dev/null || true
 
 echo "==> Installing $BINARY_NAME to $INSTALL_DIR (requires sudo) ..."
 

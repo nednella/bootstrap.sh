@@ -167,6 +167,5 @@ func replaceBinary(url, dest string) (err error) {
 	if err != nil {
 		return err
 	}
-	_ = utils.Command("sudo", "xattr", "-d", "com.apple.quarantine", staged)
 	return utils.Command("sudo", "mv", staged, dest)
 }
