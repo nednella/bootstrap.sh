@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.4.0](https://github.com/nednella/bootstrap.sh/compare/v1.3.1...v1.4.0) (2026-06-10)
+
+
+### Features
+
+* add ssh-key command ([b85576c](https://github.com/nednella/bootstrap.sh/commit/b85576cf23a0fa6332873a46dfaaf4e6f2fc72fa))
+* add update --list to show available releases ([67750de](https://github.com/nednella/bootstrap.sh/commit/67750dec6cab3eb3a9056960bb71b4e189e0bf70))
+* add update --tag to install a specific release ([a686ab0](https://github.com/nednella/bootstrap.sh/commit/a686ab0b34950b44ccf5630fccf1085e7b6506f6))
+
+
+### Bug Fixes
+
+* ensure INSTALL_DIR exists ([6b251c1](https://github.com/nednella/bootstrap.sh/commit/6b251c1b341b6e8a05cb7e9d98dd003f2a6c86b9))
+
 ## [1.3.1](https://github.com/nednella/bootstrap.sh/compare/v1.3.0...v1.3.1) (2026-06-04)
 
 
