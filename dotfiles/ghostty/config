@@ -1,5 +1,8 @@
 shell-integration = zsh
 
+# 64 MB scrollback
+scrollback-limit = 67108864
+
 theme = dracula
 
 # window-decoration = false
