@@ -15,6 +15,7 @@ cask "spotify"
 cask "iina"
 cask "visual-studio-code"
 cask "ghostty"
+cask "karabiner-elements"
 cask "alt-tab"
 cask "rectangle"
 cask "linearmouse" # 0 acceleration, 0.5 mouse sens, 32 scroll sens, middle mouse gesture btn

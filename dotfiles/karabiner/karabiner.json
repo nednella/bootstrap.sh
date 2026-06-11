@@ -1,0 +1,66 @@
+{
+    "global": {
+        "show_in_menu_bar": false
+    },
+    "profiles": [
+        {
+            "name": "Default",
+            "selected": true,
+            "simple_modifications": [],
+            "complex_modifications": {
+                "rules": [
+                    {
+                        "description": "Change caps_lock to escape on the built-in keyboard",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "caps_lock",
+                                    "modifiers": {
+                                        "optional": ["any"]
+                                    }
+                                },
+                                "to": [{ "key_code": "escape" }],
+                                "conditions": [
+                                    {
+                                        "type": "device_if",
+                                        "identifiers": [{ "is_built_in_keyboard": true }]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Swap ; and :",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "semicolon",
+                                    "modifiers": {
+                                        "mandatory": ["shift"],
+                                        "optional": ["caps_lock"]
+                                    }
+                                },
+                                "to": [{ "key_code": "semicolon" }]
+                            },
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "semicolon",
+                                    "modifiers": {
+                                        "optional": ["caps_lock"]
+                                    }
+                                },
+                                "to": [{ "key_code": "semicolon", "modifiers": ["left_shift"] }]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "virtual_hid_keyboard": {
+                "keyboard_type_v2": "iso"
+            }
+        }
+    ]
+}
