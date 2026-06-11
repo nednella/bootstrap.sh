@@ -61,3 +61,7 @@ Temporary Items
 
 # build output (make build / make release)
 /bin/
+
+# karabiner elements
+assets/
+automatic_backups/
