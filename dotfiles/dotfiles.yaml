@@ -1,0 +1,8 @@
+destinations:
+    zsh: $HOME
+    git: $HOME
+    claude: $HOME/.claude
+    ghostty: $XDG_CONFIG_HOME/ghostty
+    starship: $XDG_CONFIG_HOME/starship
+    aerospace: $XDG_CONFIG_HOME/aerospace
+    karabiner: $XDG_CONFIG_HOME/karabiner

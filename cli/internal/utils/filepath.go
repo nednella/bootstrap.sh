@@ -20,10 +20,30 @@ func DisplayName(target string) string {
 }
 
 func ExpandHome(path string) string {
+	if path == "~" {
+		return Home
+	}
 	if !strings.HasPrefix(path, "~/") {
 		return path
 	}
 	return filepath.Join(Home, path[2:])
+}
+
+// ExpandPath resolves a manifest destination: the `~` prefix plus the
+// `$HOME` / `$XDG_CONFIG_HOME` tokens. $XDG_CONFIG_HOME routes through
+// ConfigDir, so it honours the env var and falls back to ~/.config — never empty.
+func ExpandPath(path string) string {
+	expanded := os.Expand(path, func(key string) string {
+		switch key {
+		case "HOME":
+			return Home
+		case "XDG_CONFIG_HOME":
+			return ConfigDir
+		default:
+			return os.Getenv(key)
+		}
+	})
+	return ExpandHome(expanded)
 }
 
 func mustHome() string {

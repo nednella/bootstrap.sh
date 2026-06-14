@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/nednella/bootstrap.sh/internal/config"
@@ -25,18 +24,27 @@ func Dotfiles() error {
 		return fmt.Errorf("dotfiles directory not found: %s", dotfilesDir)
 	}
 
-	backupDir := filepath.Join(cfg.BackupPath, time.Now().Format(backupTimestampFormat))
+	destinations, err := loadManifest(dotfilesDir)
+	if err != nil {
+		return err
+	}
 
 	programs, err := os.ReadDir(dotfilesDir)
 	if err != nil {
 		return err
 	}
 
+	backupDir := filepath.Join(cfg.BackupPath, time.Now().Format(backupTimestampFormat))
+
 	for _, program := range programs {
 		if !program.IsDir() {
 			continue
 		}
-		err := linkProgram(filepath.Join(dotfilesDir, program.Name()), program.Name(), backupDir)
+		dest, err := destination(destinations, program.Name())
+		if err != nil {
+			return err
+		}
+		err = linkProgram(filepath.Join(dotfilesDir, program.Name()), dest, backupDir)
 		if err != nil {
 			return err
 		}
@@ -57,18 +65,27 @@ func DotfilesUndo() error {
 		return fmt.Errorf("dotfiles directory not found: %s", dotfilesDir)
 	}
 
-	backupDir := latestBackup(cfg.BackupPath)
+	destinations, err := loadManifest(dotfilesDir)
+	if err != nil {
+		return err
+	}
 
 	programs, err := os.ReadDir(dotfilesDir)
 	if err != nil {
 		return err
 	}
 
+	backupDir := latestBackup(cfg.BackupPath)
+
 	for _, program := range programs {
 		if !program.IsDir() {
 			continue
 		}
-		err := unlinkProgram(filepath.Join(dotfilesDir, program.Name()), program.Name(), backupDir)
+		dest, err := destination(destinations, program.Name())
+		if err != nil {
+			return err
+		}
+		err = unlinkProgram(filepath.Join(dotfilesDir, program.Name()), dest, backupDir)
 		if err != nil {
 			return err
 		}
@@ -78,7 +95,29 @@ func DotfilesUndo() error {
 	return nil
 }
 
-func linkProgram(programDir, programName, backupDir string) error {
+type manifest struct {
+	Destinations map[string]string `yaml:"destinations"`
+}
+
+// read dotfiles.yaml to determine where to link each program
+func loadManifest(dotfilesDir string) (map[string]string, error) {
+	manifest := manifest{}
+	err := utils.LoadYAML(filepath.Join(dotfilesDir, "dotfiles.yaml"), &manifest)
+	if err != nil {
+		return nil, err
+	}
+	return manifest.Destinations, nil
+}
+
+func destination(destinations map[string]string, programName string) (string, error) {
+	dest, ok := destinations[programName]
+	if !ok {
+		return "", fmt.Errorf("no destination declared for %q in dotfiles.yaml", programName)
+	}
+	return utils.ExpandPath(dest), nil
+}
+
+func linkProgram(programDir, dest, backupDir string) error {
 	entries, err := os.ReadDir(programDir)
 	if err != nil {
 		return err
@@ -86,7 +125,7 @@ func linkProgram(programDir, programName, backupDir string) error {
 
 	for _, entry := range entries {
 		src := filepath.Join(programDir, entry.Name())
-		target := resolveTarget(entry.Name(), programName)
+		target := filepath.Join(dest, entry.Name())
 		err := link(src, target, backupDir)
 		if err != nil {
 			return err
@@ -95,7 +134,7 @@ func linkProgram(programDir, programName, backupDir string) error {
 	return nil
 }
 
-func unlinkProgram(programDir, programName, backupDir string) error {
+func unlinkProgram(programDir, dest, backupDir string) error {
 	entries, err := os.ReadDir(programDir)
 	if err != nil {
 		return err
@@ -103,21 +142,13 @@ func unlinkProgram(programDir, programName, backupDir string) error {
 
 	for _, entry := range entries {
 		src := filepath.Join(programDir, entry.Name())
-		target := resolveTarget(entry.Name(), programName)
+		target := filepath.Join(dest, entry.Name())
 		err := unlink(src, target, backupDir)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-// resolveTarget applies the convention: dot-prefix → $HOME, else → $XDG_CONFIG_HOME/<program>/
-func resolveTarget(filename, programName string) string {
-	if strings.HasPrefix(filename, ".") {
-		return filepath.Join(utils.Home, filename)
-	}
-	return filepath.Join(utils.ConfigDir, programName, filename)
 }
 
 func link(src, target, backupDir string) error {
