@@ -84,19 +84,26 @@ bootstrap.sh/
 
 ## Dotfiles convention
 
-Flat tree, **one directory per program**. Within a program directory the symlink destination follows a single rule:
+Flat tree, **one directory per program**. Each program directory declares its link destination in the manifest, `dotfiles/dotfiles.yaml`; every entry inside that directory is symlinked into the declared destination. Destinations expand the tokens `$HOME` and `$XDG_CONFIG_HOME` (the latter routes through `utils.ConfigDir`, so it honours the env var and falls back to `~/.config` — never empty), plus a leading `~` / `~/…`.
 
-- File starts with `.` → symlinked into `$HOME`.
-- Otherwise → `${XDG_CONFIG_HOME:-$HOME/.config}/<program>/`.
+```yaml
+# dotfiles/dotfiles.yaml
+destinations:
+  zsh: $HOME
+  git: $HOME
+  claude: $HOME/.claude
+  ghostty: $XDG_CONFIG_HOME/ghostty
+  starship: $XDG_CONFIG_HOME/starship
+```
 
 | Source | Destination |
 |---|---|
 | `dotfiles/zsh/.zshrc` | `~/.zshrc` |
 | `dotfiles/git/.gitconfig` | `~/.gitconfig` |
+| `dotfiles/claude/CLAUDE.md` | `~/.claude/CLAUDE.md` |
 | `dotfiles/ghostty/config` | `~/.config/ghostty/config` |
-| `dotfiles/starship/starship.toml` | `~/.config/starship/starship.toml` |
 
-The dot prefix carries the intent — no metadata files. The walk skips non-directories, so a loose file in `dotfiles/` would be ignored (which is why the `Brewfile` lives at the repo root, not here).
+The destination is per *directory*, not per file — a file's name (dot-prefixed or not) is just its name at the destination, it no longer decides routing. This is what lets a whole program live under a root dotfile dir like `~/.claude` (the dir itself stays real — only the entries inside it are symlinks — so a tool's runtime state there is untouched). Every program directory **must** be declared; an undeclared one is an error, not a silent default. The manifest is a loose file, so the directory-only walk skips it for free (same reason the `Brewfile` lives at the repo root).
 
 ---
 
