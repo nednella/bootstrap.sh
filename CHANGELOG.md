@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/nednella/bootstrap.sh/compare/v1.5.1...v1.6.0) (2026-06-14)
+
+
+### Features
+
+* use manifest to determine dotfiles symlink path ([0ad12a8](https://github.com/nednella/bootstrap.sh/commit/0ad12a83cbbea288ea963e3862c1d50247bf2cd5))
+
 ## [1.5.1](https://github.com/nednella/bootstrap.sh/compare/v1.5.0...v1.5.1) (2026-06-10)
 
 
