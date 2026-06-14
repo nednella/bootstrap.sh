@@ -45,3 +45,38 @@
 
 - End each plan with unresolved questions, if any. Concise.
 - Never commit plans.
+
+## Agents
+
+Delegate implementation and research to subagents via the Task tool. Skip delegation for trivial edits (typos, single lines, imports). For cross-cutting work, run several in parallel.
+
+**By language / file type**
+
+| Pattern | Agent |
+|---|---|
+| `*.go` | golang-expert |
+| `*.tsx` / `*.jsx`, React | react-expert |
+| `*.ts` (non-React) | typescript-expert |
+| `*.py` | python-expert |
+
+**By role**
+
+| Work | Agent |
+|---|---|
+| Backend — server, DB, auth, middleware | backend-expert |
+| Frontend — HTML/CSS, browser-side | frontend-expert |
+| Mixed front + back | fullstack-expert |
+| UI/UX — styling, layout, design systems | ui-expert |
+| Security review — input, auth, secrets, OWASP | security-expert |
+| Docs — keep docs in sync with code | docs-expert |
+
+**Research (read-only — use freely before editing)**
+
+| Need | Agent |
+|---|---|
+| Where does X live? | codebase-locator-expert |
+| How does X work? | codebase-analyzer-expert |
+| Existing pattern to copy? | codebase-pattern-expert |
+| Current web / library info | research-expert |
+
+Role agents win when the task is role-scoped (API, security, UI) even across languages; language agents for single-language implementation.
