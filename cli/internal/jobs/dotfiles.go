@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/nednella/bootstrap.sh/internal/config"
@@ -36,6 +37,7 @@ func Dotfiles() error {
 
 	backupDir := filepath.Join(cfg.BackupPath, time.Now().Format(backupTimestampFormat))
 
+	var counts linkCounts
 	for _, program := range programs {
 		if !program.IsDir() {
 			continue
@@ -44,13 +46,21 @@ func Dotfiles() error {
 		if err != nil {
 			return err
 		}
-		err = linkProgram(filepath.Join(dotfilesDir, program.Name()), dest, backupDir)
+		err = linkProgram(filepath.Join(dotfilesDir, program.Name()), dest, backupDir, &counts)
 		if err != nil {
 			return err
 		}
 	}
 
-	ui.Success("Dotfiles linked")
+	if counts.backedUp > 0 {
+		ui.Info("originals backed up → " + backupDir)
+	}
+	summary := counts.summary()
+	if summary == "" {
+		ui.Success("Dotfiles linked")
+	} else {
+		ui.Success("Dotfiles linked — " + summary)
+	}
 	return nil
 }
 
@@ -117,7 +127,51 @@ func destination(destinations map[string]string, programName string) (string, er
 	return utils.ExpandPath(dest), nil
 }
 
-func linkProgram(programDir, dest, backupDir string) error {
+type linkResult int
+
+const (
+	resultLinked linkResult = iota
+	resultUnchanged
+	resultRelinked
+	resultBackedUp
+)
+
+type linkCounts struct {
+	linked, unchanged, relinked, backedUp int
+}
+
+func (c *linkCounts) add(r linkResult) {
+	switch r {
+	case resultLinked:
+		c.linked++
+	case resultUnchanged:
+		c.unchanged++
+	case resultRelinked:
+		c.relinked++
+	case resultBackedUp:
+		c.linked++
+		c.backedUp++
+	}
+}
+
+func (c linkCounts) summary() string {
+	var parts []string
+	if c.linked > 0 {
+		parts = append(parts, fmt.Sprintf("%d linked", c.linked))
+	}
+	if c.relinked > 0 {
+		parts = append(parts, fmt.Sprintf("%d re-linked", c.relinked))
+	}
+	if c.backedUp > 0 {
+		parts = append(parts, fmt.Sprintf("%d backed up", c.backedUp))
+	}
+	if c.unchanged > 0 {
+		parts = append(parts, fmt.Sprintf("%d skipped", c.unchanged))
+	}
+	return strings.Join(parts, ", ")
+}
+
+func linkProgram(programDir, dest, backupDir string, counts *linkCounts) error {
 	entries, err := os.ReadDir(programDir)
 	if err != nil {
 		return err
@@ -126,10 +180,11 @@ func linkProgram(programDir, dest, backupDir string) error {
 	for _, entry := range entries {
 		src := filepath.Join(programDir, entry.Name())
 		target := filepath.Join(dest, entry.Name())
-		err := link(src, target, backupDir)
+		result, err := link(src, target, backupDir)
 		if err != nil {
 			return err
 		}
+		counts.add(result)
 	}
 	return nil
 }
@@ -151,19 +206,18 @@ func unlinkProgram(programDir, dest, backupDir string) error {
 	return nil
 }
 
-func link(src, target, backupDir string) error {
+func link(src, target, backupDir string) (linkResult, error) {
 	name := utils.DisplayName(target)
 
 	switch {
 	case !utils.Exists(target):
-		return createLink(src, target, name)
+		return resultLinked, createLink(src, target, name)
 	case utils.IsSymlinkedTo(target, src):
-		ui.Info(name + " — already linked")
-		return nil
+		return resultUnchanged, nil
 	case utils.IsSymlinked(target):
-		return replaceLink(src, target, name)
+		return resultRelinked, replaceLink(src, target, name)
 	default:
-		return backupAndLink(src, target, backupDir, name)
+		return resultBackedUp, backupAndLink(src, target, backupDir, name)
 	}
 }
 
@@ -207,12 +261,11 @@ func backupAndLink(src, target, backupDir, name string) error {
 	if err != nil {
 		return err
 	}
-	ui.Warn(name + " — backed up to " + backupDir)
 	err = utils.Symlink(src, target)
 	if err != nil {
 		return err
 	}
-	ui.Info(name + " — linked")
+	ui.Warn(name + " — linked (backed up original)")
 	return nil
 }
 
