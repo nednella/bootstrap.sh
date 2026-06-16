@@ -8,7 +8,7 @@ import (
 
 var sshKeyCmd = &cobra.Command{
 	Use:     "ssh-key",
-	Short:   "Generate an SSH key and copy it to the clipboard",
+	Short:   "Generate an SSH key",
 	GroupID: jobsGroupID,
 	Run: func(cmd *cobra.Command, args []string) {
 		ui.Header("ssh-key")

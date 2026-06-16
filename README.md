@@ -8,7 +8,7 @@ Bootstrap a fresh Mac quicker than the time it takes to make a cuppa.
 - 🍺 **Homebrew on autopilot** — grabs Homebrew if it's missing, then pours every package from your `Brewfile`.
 - 🔗 **Dotfiles that write home** — your configs symlink out of the repo, so tweak one and it lands straight back in git. Commit, push, done.
 - 💻 **A Mac that feels like yours** — bends a fresh machine's settings to your will in a single job.
-- 🔑 **SSH in seconds** — `ssh-key` mints a git/GitHub SSH key and drops the public half on your clipboard.
+- 🔑 **SSH in seconds** — `ssh-key` mints a git/GitHub SSH key and tells you how to grab the public half.
 - 🔄 **Ages like fine wine** — `update` grabs the newest binary, `sync` pulls the latest changes.
 - 👀 **No nasty surprises** — `--dry-run` shows you exactly what'll happen before anything changes.
 
@@ -28,7 +28,7 @@ bootstrap dotfiles            # symlink dotfiles into $HOME / XDG
 bootstrap dotfiles --undo     # unlink dotfiles and restore the latest backup
 bootstrap install             # install packages from Brewfile
 bootstrap macos               # apply macOS preferences
-bootstrap ssh-key             # generate an SSH key and copy it to the clipboard
+bootstrap ssh-key             # generate an SSH key
 bootstrap sync                # pull the latest changes from the remote repository
 bootstrap update              # update the binary to the latest release
 bootstrap update --list       # list available releases

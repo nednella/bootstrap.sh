@@ -25,7 +25,7 @@ Every **job command** runs `preflight` first (root `PersistentPreRun`, gated to 
 - `bootstrap install` — `brew bundle` against `<clone>/Brewfile`.
 - `bootstrap dotfiles` — symlink `<clone>/dotfiles/` into `$HOME` / `$XDG_CONFIG_HOME` (existing files backed up to `~/.dotfiles-backup/<timestamp>/` first). `--undo` / `-u` reverses it: targets symlinked into the clone are removed, then originals restored from the latest backup (the backup mirrors each file's `$HOME`-relative path, so the restore is a clean inverse walk).
 - `bootstrap macos` — apply macOS `defaults` read from `<clone>/macos/settings.yaml`.
-- `bootstrap ssh-key` — generate an ed25519 SSH key (comment = `git config user.email`, which it requires) and copy the public key to the clipboard via `pbcopy`. Git/GitHub-specific, not a generic keygen.
+- `bootstrap ssh-key` — generate an ed25519 SSH key (comment = `git config user.email`, which it requires), then print the `pbcopy` command to copy the public key to the clipboard. Git/GitHub-specific, not a generic keygen.
 
 Symlinks point into the clone, so editing a config file writes through to the repo — commit + push upstream with normal git from `~/.bootstrap.sh`.
 
@@ -114,7 +114,7 @@ bootstrap install             # install packages from Brewfile
 bootstrap dotfiles            # symlink dotfiles into $HOME / XDG
 bootstrap dotfiles --undo     # unlink dotfiles and restore the latest backup
 bootstrap macos               # apply macOS preferences
-bootstrap ssh-key             # generate an SSH key and copy it to the clipboard
+bootstrap ssh-key             # generate an SSH key
 bootstrap update              # update the binary to the latest release
 bootstrap update --list       # list available releases
 bootstrap update --tag <tag>  # install a specific release

@@ -18,7 +18,12 @@ var (
 	dryStyle         = lipgloss.NewStyle().Foreground(lipgloss.Color("8")).MarginLeft(2).Width(8)  // grey
 	sudoStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("13")).MarginLeft(2).Width(8) // bright magenta
 	dryBodyStyle     = lipgloss.NewStyle().Faint(true)
+	codeStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("14")) // bright cyan
 )
+
+func Code(s string) string {
+	return codeStyle.Render(s)
+}
 
 func Die(msg string) {
 	Error(msg)

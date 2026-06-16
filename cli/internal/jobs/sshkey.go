@@ -23,12 +23,7 @@ func SSHKey() error {
 		ui.Success("Key generated")
 	}
 
-	err := utils.Command("bash", "-c", "pbcopy < '"+pubPath+"'")
-	if err != nil {
-		return err
-	}
-
-	ui.Success("Public key copied to clipboard")
+	ui.Info("Copy to clipboard - " + ui.Code("pbcopy < ~/"+utils.DisplayName(pubPath)))
 	return nil
 }
 
