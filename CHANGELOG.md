@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/nednella/bootstrap.sh/compare/v1.6.0...v1.7.0) (2026-06-16)
+
+
+### Features
+
+* **ssh-key:** print pbcopy command instead of copying to clipboard ([f7da3f3](https://github.com/nednella/bootstrap.sh/commit/f7da3f354e02c096b3c2c55c4178483c1c7341fb))
+
 ## [1.6.0](https://github.com/nednella/bootstrap.sh/compare/v1.5.1...v1.6.0) (2026-06-14)
 
 
