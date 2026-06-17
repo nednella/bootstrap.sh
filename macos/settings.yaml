@@ -10,3 +10,23 @@ defaults:
       value_type: bool
       value: "true"
       current_host: true
+
+    - domain: NSGlobalDomain
+      key: com.apple.swipescrolldirection
+      value_type: bool
+      value: "false" # requires logout
+
+    - domain: NSGlobalDomain
+      key: ApplePressAndHoldEnabled
+      value_type: bool
+      value: "false" # hold a key to repeat it instead of the accent menu; requires logout
+
+    - domain: NSGlobalDomain
+      key: KeyRepeat
+      value_type: int
+      value: "2" # repeat speed once held (~30ms); requires logout
+
+    - domain: NSGlobalDomain
+      key: InitialKeyRepeat
+      value_type: int
+      value: "15" # delay before repeat starts (~225ms); requires logout
