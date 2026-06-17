@@ -11,7 +11,7 @@
 
 - The best code is the code you didn't write. Less is more.
 - The code you do write should be clean above all else.
-- Comments only when they carry what the code itself can't: a non-obvious _why_. Never regurgitate the code itself.
+- Default to NO comments. Comments should ONLY be included when they carry what the code itself can't: a non-obvious _why_. Never regurgitate the code itself.
 - Avoid duplication — prefer importing over rewriting; if you need a variant, extend the existing function with a parameter and tidy it. Trivial cases excepted.
 - Write with the intention that a senior lead reviewing the output would give the green light. Avoid lazy, sloppy or short-sighted outputs.
 - Write with the intention that someone else in a year's time will quickly be up to speed on what it does.
@@ -52,31 +52,31 @@ Delegate implementation and research to subagents via the Task tool. Skip delega
 
 **By language / file type**
 
-| Pattern | Agent |
-|---|---|
-| `*.go` | golang-expert |
-| `*.tsx` / `*.jsx`, React | react-expert |
-| `*.ts` (non-React) | typescript-expert |
-| `*.py` | python-expert |
+| Pattern                  | Agent             |
+| ------------------------ | ----------------- |
+| `*.go`                   | golang-expert     |
+| `*.tsx` / `*.jsx`, React | react-expert      |
+| `*.ts` (non-React)       | typescript-expert |
+| `*.py`                   | python-expert     |
 
 **By role**
 
-| Work | Agent |
-|---|---|
-| Backend — server, DB, auth, middleware | backend-expert |
-| Frontend — HTML/CSS, browser-side | frontend-expert |
-| Mixed front + back | fullstack-expert |
-| UI/UX — styling, layout, design systems | ui-expert |
-| Security review — input, auth, secrets, OWASP | security-expert |
-| Docs — keep docs in sync with code | docs-expert |
+| Work                                          | Agent            |
+| --------------------------------------------- | ---------------- |
+| Backend — server, DB, auth, middleware        | backend-expert   |
+| Frontend — HTML/CSS, browser-side             | frontend-expert  |
+| Mixed front + back                            | fullstack-expert |
+| UI/UX — styling, layout, design systems       | ui-expert        |
+| Security review — input, auth, secrets, OWASP | security-expert  |
+| Docs — keep docs in sync with code            | docs-expert      |
 
 **Research (read-only — use freely before editing)**
 
-| Need | Agent |
-|---|---|
-| Where does X live? | codebase-locator-expert |
-| How does X work? | codebase-analyzer-expert |
-| Existing pattern to copy? | codebase-pattern-expert |
-| Current web / library info | research-expert |
+| Need                       | Agent                    |
+| -------------------------- | ------------------------ |
+| Where does X live?         | codebase-locator-expert  |
+| How does X work?           | codebase-analyzer-expert |
+| Existing pattern to copy?  | codebase-pattern-expert  |
+| Current web / library info | research-expert          |
 
 Role agents win when the task is role-scoped (API, security, UI) even across languages; language agents for single-language implementation.
