@@ -30,3 +30,18 @@ defaults:
       key: InitialKeyRepeat
       value_type: int
       value: "15" # delay before repeat starts (~225ms); requires logout
+
+
+# Manual changes:
+#   - Appearance → Icon & widget style → Dark
+#   - Displays → Automatically adjust brightness → OFF
+#   - Displays → colour profile → Display P3
+#   - Menu Bar → remove from menu bar: Spotlight, Focus, Screen Mirroring, Display, Now Playing
+#   - Menu Bar → disable all "Allow in the Menu Bar" items
+#   - Lock Screen → Turn display off on battery when inactive → 10 min
+#   - Lock Screen → Require password after screen saver begins or display is off → Immediately
+#   - Keyboard → Keyboard Shortcuts → Screenshots → Copy picture of selected area to the clipboard → ⌥⇧S
+
+# TODO:
+# - Finder
+# - Spotlight
