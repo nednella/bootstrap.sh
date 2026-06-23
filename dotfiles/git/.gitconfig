@@ -70,6 +70,9 @@
 	d      			= diff
 	ds      		= diff --staged
 
+	# push
+	pushf			= push --force-with-lease
+
 	# stage
 	a				= add
 	aa				= add --all
