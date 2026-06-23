@@ -11,8 +11,8 @@ macos-titlebar-style = tabs
 macos-titlebar-proxy-icon = hidden
 
 background-blur = 50
-background-opacity = 0.8
-unfocused-split-opacity = 0.8
+background-opacity = 0.9
+unfocused-split-opacity = 0.5
 
 window-colorspace = "display-p3"
 window-padding-x = 10
