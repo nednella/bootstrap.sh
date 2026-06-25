@@ -87,7 +87,7 @@
 	# undo / fixup
 	unstage			= reset HEAD --
 	undo			= reset --soft HEAD~1
-	uncommit		= reset --mixed HEAD~1
+	uncm			= reset --mixed HEAD~1
 
 	# stash shortcuts
 	stl				= stash list
