@@ -32,14 +32,17 @@
 - Bulk/repetitive edits: script it, back up originals, remove script + backups once I confirm.
 - If I say twice it's still broken, offer task-prefixed debug logs; remove them once confirmed.
 - Don't create files unless necessary — prefer editing what exists; no unprompted docs or READMEs. New files are fine when they _are_ the deliverable. Always clean up after yourself — temp/scratch files, `tmp/` artefacts, anything you generated to get the job done. Leave nothing behind.
-- GitHub via the `gh` CLI.
+
+## Hard Rules
+
+- When working with any **Upscope-related repositories**, you are to **NEVER** push a local working branch to its origin. You work locally only. Furthermore, you are to **NEVER** open, edit, merge or close a pull request. NO EXCEPTIONS.
 
 ## Commits
 
 - One logical change per commit. If the commit message would feature an "and/&", you are making a mistake.
 - Auto-commit low-stakes work: single-file or isolated, tested, established pattern, no API or architectural change. One-line confirmation, no fanfare.
 - Ask first for anything else — multi-file with dependencies, refactors, public-API changes, new features, or any uncertainty.
-- Never push or run destructive commands unless asked.
+- Never run destructive git commands unless asked.
 
 ## Plans
 
