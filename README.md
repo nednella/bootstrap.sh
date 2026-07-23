@@ -1,6 +1,6 @@
 # bootstrap.sh
 
-Bootstrap a fresh Mac quicker than the time it takes to make a cuppa.
+This is my personal mac CLI configuration tool to manage my setup.
 
 ## Features
 
