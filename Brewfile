@@ -8,6 +8,8 @@ brew "fnm"
 brew "uv"
 brew "go"
 
+brew "ngrok"
+
 cask "proton-mail"
 cask "proton-pass"
 cask "spotify"
