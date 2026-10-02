@@ -1,6 +1,7 @@
 brew "gh"
 brew "starship"
 brew "neovim"
+brew "tmux"
 brew "zsh-autosuggestions"
 brew "zsh-syntax-highlighting"
 
