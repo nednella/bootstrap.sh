@@ -1,19 +1,52 @@
 data_dir: ~/Library/Mobile Documents/com~apple~CloudDocs/Documents/agentos
-agent: claude
+keep_mac_awake: true
+agent_command: claude
+session_model: sonnet
+session_effort: medium
 projects:
   - name: livedocument
-    dir: /Users/nednella/code/upscope/livedocument
-    cleanup: upscope worktree remove {branch}
-    branch: "issue-{n}"
-    on_review: "address the review on PR #{n}: fix what it asks and push; never merge, mark ready or request reviewers"
-    on_checks: "fix the failing checks on PR #{n} and push; never merge, mark ready or request reviewers"
-    commands:
-      inbox: "/investigate {n}"
+    directory: /Users/nednella/code/upscope/livedocument
+    session_branch_fallback: "issue-{n}"
+    session_cleanup_command: "upscope worktree remove {branch} && git branch -D {branch}"
+    session_cleanup_mode:
+      merge: auto
+      close: auto
+    pr_review_command: "address the review on PR #{n}: fix what it asks and push; never merge, mark ready or request reviewers"
+    pr_checks_command: "fix the failing checks on PR #{n} and push; never merge, mark ready or request reviewers"
+    queue_sections:
+      - name: Ready
+        labels: [ready]
+        actions:
+          - { name: Work, command: "/work {n}" }
+      - name: Needs plan
+        labels: [needs-plan]
+        actions:
+          - { name: Investigate, command: "/investigate {n}", model: opus }
+      - name: Needs you
+        labels: [needs-human]
+        actions:
+          - { name: Open, command: "" }
+      - name: Ideas
+        labels: [idea, roadmap, "type:bug", "type:chore", "type:feature", "type:refactor"]
+        actions:
+          - { name: Open, command: "" }
+      - name: Inbox
+        actions:
+          - { name: Investigate, command: "/investigate {n}" }
   - name: agentos
-    dir: /Users/nednella/code/agentos
-    branch: "issue-{n}"
-    on_review: "address the review on PR #{n}: fix what it asks and push; never merge, mark ready or request reviewers"
-    on_checks: "fix the failing checks on PR #{n} and push; never merge, mark ready or request reviewers"
-    commands:
-      inbox: "/work {n}"
-      ready: "/work {n}"
+    directory: /Users/nednella/code/agentos
+    session_branch_fallback: "issue-{n}"
+    session_cleanup_command: "git worktree remove {worktree} && git branch -D {branch}"
+    session_cleanup_mode:
+      merge: auto
+      close: auto
+    pr_review_command: "address the review on PR #{n}: fix what it asks and push; never merge, mark ready or request reviewers"
+    pr_checks_command: "fix the failing checks on PR #{n} and push; never merge, mark ready or request reviewers"
+    queue_sections:
+      - name: Inbox
+        actions:
+          - { name: Work, command: "/work {n}" }
+      - name: Ready
+        labels: [ready]
+        actions:
+          - { name: Work, command: "/work {n}" }
