@@ -8,6 +8,7 @@ brew "zsh-syntax-highlighting"
 brew "fnm"
 brew "uv"
 brew "go"
+brew "jq"
 
 brew "ngrok"
 
