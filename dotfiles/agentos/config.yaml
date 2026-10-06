@@ -1,8 +1,7 @@
 data_dir: ~/Library/Mobile Documents/com~apple~CloudDocs/Documents/agentos
 keep_mac_awake: true
+app_text_scale: 0.92
 agent_command: claude
-session_model: sonnet
-session_effort: medium
 projects:
   - name: livedocument
     directory: /Users/nednella/code/upscope/livedocument
@@ -17,22 +16,22 @@ projects:
       - name: Ready
         labels: [ready]
         actions:
-          - { name: Work, command: "/work {n}" }
+          - {name: Work, command: "/work {n}"}
       - name: Needs plan
         labels: [needs-plan]
         actions:
-          - { name: Investigate, command: "/investigate {n}", model: opus }
+          - {name: Investigate, command: "/investigate {n}", model: opus}
       - name: Needs you
         labels: [needs-human]
         actions:
-          - { name: Open, command: "" }
+          - {name: Open, command: ""}
       - name: Ideas
         labels: [idea, roadmap, "type:bug", "type:chore", "type:feature", "type:refactor"]
         actions:
-          - { name: Open, command: "" }
+          - {name: Open, command: ""}
       - name: Inbox
         actions:
-          - { name: Investigate, command: "/investigate {n}" }
+          - {name: Investigate, command: "/investigate {n}"}
   - name: agentos
     directory: /Users/nednella/code/agentos
     session_branch_fallback: "issue-{n}"
@@ -45,8 +44,9 @@ projects:
     queue_sections:
       - name: Inbox
         actions:
-          - { name: Work, command: "/work {n}" }
+          - {name: Work, command: "/work {n}"}
       - name: Ready
         labels: [ready]
         actions:
-          - { name: Work, command: "/work {n}" }
+          - {name: Work, command: "/work {n}"}
+    browser_enabled: true
