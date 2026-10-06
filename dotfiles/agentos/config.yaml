@@ -1,0 +1,19 @@
+data_dir: ~/Library/Mobile Documents/com~apple~CloudDocs/Documents/agentos
+agent: claude
+projects:
+  - name: livedocument
+    dir: /Users/nednella/code/upscope/livedocument
+    cleanup: upscope worktree remove {branch}
+    branch: "issue-{n}"
+    on_review: "address the review on PR #{n}: fix what it asks and push; never merge, mark ready or request reviewers"
+    on_checks: "fix the failing checks on PR #{n} and push; never merge, mark ready or request reviewers"
+    commands:
+      inbox: "/investigate {n}"
+  - name: agentos
+    dir: /Users/nednella/code/agentos
+    branch: "issue-{n}"
+    on_review: "address the review on PR #{n}: fix what it asks and push; never merge, mark ready or request reviewers"
+    on_checks: "fix the failing checks on PR #{n} and push; never merge, mark ready or request reviewers"
+    commands:
+      inbox: "/work {n}"
+      ready: "/work {n}"

@@ -6,3 +6,4 @@ destinations:
     starship: $XDG_CONFIG_HOME/starship
     aerospace: $XDG_CONFIG_HOME/aerospace
     karabiner: $XDG_CONFIG_HOME/karabiner
+    agentos: $XDG_CONFIG_HOME/agentos
