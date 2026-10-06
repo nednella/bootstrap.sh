@@ -9,6 +9,7 @@ brew "fnm"
 brew "uv"
 brew "go"
 brew "jq"
+brew "bun"
 
 brew "ngrok"
 
