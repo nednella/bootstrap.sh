@@ -36,5 +36,6 @@
       "Bash(wget * | bash)"
     ]
   },
-  "cleanupPeriodDays": 14
+  "cleanupPeriodDays": 14,
+  "outputStyle": "ASD-STE100"
 }
