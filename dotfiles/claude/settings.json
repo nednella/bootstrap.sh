@@ -34,7 +34,7 @@
       "Bash(wget * | bash)"
     ]
   },
-  "cleanupPeriodDays": 14,
+  "cleanupPeriodDays": 90,
   "outputStyle": "ASD-STE100",
   "hooks": {
     "PreToolUse": [
