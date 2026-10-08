@@ -65,3 +65,6 @@ Temporary Items
 # karabiner elements
 assets/
 automatic_backups/
+
+# claude
+dotfiles/claude/skills/synced/
