@@ -28,6 +28,8 @@
       "Read(./**/.env)",
       "Read(./**/.env.*)",
       "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.config/gh/**)",
       "Bash(curl * | sh)",
       "Bash(curl * | bash)",
       "Bash(wget * | sh)",
