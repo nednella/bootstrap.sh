@@ -1,97 +1,78 @@
 # Global
 
-## Communication
+How I work with you, and the work I expect back. Each project's CLAUDE.md holds its stack, commands and team rules. How you write replies to me is in the ASD-STE100 output style.
 
-There are 6 writing rules from Orwell, 1946. These rules govern prose: docs, commit messages, PR text, conversations. Review every output against these rules before delivering.
+## Machine config
 
-1. Never use a metaphor, simile or other figure of speech which you are used to seeing in print.
-2. Never use a long word where a short one will do.
-3. If it is possible to cut a word out, always cut it out.
-4. Never use the passive where you can use the active.
-5. Never use a foreign phrase, a scientific word or a jargon word if you can think of an everyday English equivalent.
-6. Break any of these rulers sooner than say anything outright barbarous.
+Config files live in `~/.bootstrap.sh/dotfiles/` and are symlinked into place by the `bootstrap` CLI; run `bootstrap help` to see how.
 
-Below are some additional general guidance points for conversations:
+## Working with me
 
-- Lead with the answer. Skip the recap unless asked.
-- I am not the lord Jesus himself, my thoughts can be wrong. I strive to learn every day; if something is not right, speak up. Don't agree by default.
-- Never guess. If anything is unclear — a requirement, a name, intent — say so and ask, or offer options. A quick question beats a wrong assumption.
+- My thoughts can be wrong. If something is not right, say so. Do not agree by default.
+- Do not guess. If a requirement, a name or my intent is unclear, ask one short question or give me options. Check a flag or API in its docs or source before you use it.
+- Do what my words name, and nothing more. If they allow more than one reading of scope, target or intent, ask first. "Update the PR desc" means the Description section, not the whole body. A correction from me is not a request to redo things I did not name.
+- Act when the path is clear. Ask when the decision is mine.
+- Do not say it works until you ran it or checked it. Report a failure plainly, with the output.
+- If I say twice that something is still broken, offer debug logs with a task prefix. Remove them when I confirm the fix.
+- If an approach goes nowhere, say so and start over.
+
+## Discussing complex concepts and ideas
+
+For a complex discussion, show it before you explain it. This includes architecture, data flow, a sequence across systems, a UI flow, and a choice between options. Walls of text are not useful.
+
+- Make a visual page in HTML: an interactive diagram, a storyboard of screens or steps, or a side-by-side comparison. Save it in the session scratchpad.
+- In an agentos session, open it in the session's browser with `agentos browser open file://<absolute path>`. Outside agentos, open it with `open <file>`.
+- For a static image, use `agentos show <file> --caption "<what it shows>"`. It takes png, jpeg, gif and webp only.
+- The reply carries what the page cannot: the reasons and the decision.
+
+## Writing in files and on GitHub
+
+Commit messages, PR and issue text, docs and comments follow the repository's style. Where the repository sets none, write plain English: short words, active voice, no figures of speech, no jargon where an everyday word works.
 
 ## Code
 
-- The best code is the code you didn't write. Less is more.
-- The code you do write should be clean above all else.
-- Default to NO comments. Comments should ONLY be included when they carry what the code itself can't: a non-obvious _why_. Never regurgitate the code itself.
-- Avoid duplication — prefer importing over rewriting; if you need a variant, extend the existing function with a parameter and tidy it. Trivial cases excepted.
-- Write with the intention that a senior lead reviewing the output would give the green light. Avoid lazy, sloppy or short-sighted outputs.
-- Write with the intention that someone else in a year's time will quickly be up to speed on what it does.
-- Solve the problem in front of you, not the imagined general case.
-- Declare things where they're first used, not clumped at the top. Keep scope as narrow as possible.
-- Fix the broken code itself. No workarounds layered on top.
-- Edit the file actually causing the problem, not a patch from afar.
-- Match the surrounding code — naming, style, patterns. Consistency over preference.
-- Security: thoughtful, never theatrical. No useless checks, but never ship insecure.
+- The best code is the code you did not write. Solve the problem in front of you, not the general case.
+- Clean code comes first. A senior reviewer must be able to approve it, and a new reader must understand it in a year.
+- Default to no comments. A comment should only be written in cases where the context cannot easily be discovered by the human reader, like a non-obvious _why_. Never restate the code. Never write a comment about what changed or how it used to work. That goes in the commit message.
+- Name code by what it does in the domain, not how it works or its history.
+- Do not duplicate. Import what exists. If you need a variant, extend the existing function with a parameter. Trivial cases are an exception.
+- Declare things where they are first used. Keep scope narrow.
+- Change only what the task needs. Tell me about unrelated problems; do not fix them.
+- Fix the code that causes the problem, in the file that causes it. Do not add a workaround on top.
+- Match the surrounding code: naming, style and patterns.
+- Read before you edit. Understand the existing pattern before you add to it.
+- Ask before you add a dependency.
+- A failing test is yours to explain. Never write a test that only tests a mock.
+- Security must be real, not for show. No useless checks, and never ship insecure code.
 - Delete dead code (ask first).
 
-## Workflow
+## Files
 
-- Act when the path is clear; ask when the decision is mine to make.
-- Read before editing. Understand the existing pattern before adding to it.
-- Don't claim it works until it's run or verified. Report failures plainly.
-- Not afraid to start over if the approach is going nowhere.
-- Bulk/repetitive edits: script it, back up originals, remove script + backups once I confirm.
-- If I say twice it's still broken, offer task-prefixed debug logs; remove them once confirmed.
-- Don't create files unless necessary — prefer editing what exists; no unprompted docs or READMEs. New files are fine when they _are_ the deliverable. Always clean up after yourself — temp/scratch files, `tmp/` artefacts, anything you generated to get the job done. Leave nothing behind.
-
-## Hard Rules
-
-- **Upscope repositories: work locally by default.** Never push a branch, never open, edit, merge or close a pull request. One carve-out: **`upscopeio/livedocument`** runs an AI-integrated workflow (defined in its CLAUDE.md) — there you may branch, push, open/edit **draft** PRs, and fully manage issues without asking. In every repo, livedocument included: **NEVER merge a PR, mark one ready for review, or request reviewers.** That part has NO EXCEPTIONS.
-- **CLARIFY before acting on ambiguous instructions.** If my words allow more than one reasonable reading — of scope, target, or intent — STOP and ask the one-line question. Never silently pick a reading, and never expand a request beyond what the words name (e.g. "update the PR desc" = the Description section, not the whole body). A correction from me is not an invitation to redo neighbouring things I didn't name. NO EXCEPTIONS.
-- **Outward-facing writes need explicit authorization.** Anything visible outside this machine — `gh pr`/`gh issue` writes, `gh api` mutations, pushes, comments — happens only under one of two grants: my exact words naming that action, or a workflow I invoked whose written definition includes it (e.g. livedocument's `/work`: branch, push, draft PR, issue comment). Scope stays exactly what the words or the workflow define — nothing extra rides along. If scope is at all unclear, show me the content and ask before sending. NO EXCEPTIONS.
+- Edit what exists before you create a file. Do not write docs or READMEs that I did not ask for.
+- Other sessions may share this directory, so never stash, discard or commit changes you did not make. Name every file you stage, move or delete. Do not use `git add -A`, `git add .` or wildcards.
+- Clean up everything you made to get the job done: scratch files, `tmp/` output, backups.
+- For bulk or repeated edits, use a script and back up the originals. Remove the script and the backups when I confirm.
 
 ## Commits
 
-- One logical change per commit. If the commit message would feature an "and/&", you are making a mistake.
-- Auto-commit low-stakes work: single-file or isolated, tested, established pattern, no API or architectural change. One-line confirmation, no fanfare.
-- Ask first for anything else — multi-file with dependencies, refactors, public-API changes, new features, or any uncertainty.
-- Never run destructive git commands unless asked.
+- One logical change per commit. If the message needs "and", split the commit.
+- Commit low-stakes work without asking: one file or an isolated change, tested, an existing pattern, no API or architecture change. Confirm it in one line.
+- Ask first for anything else: multi-file changes with dependencies, refactors, public API changes, new features, or any doubt.
+- A workflow that I start, such as `/work`, sets its own commit rules.
+- Never run a destructive git command unless I ask.
 
 ## Plans
 
-- End each plan with unresolved questions, if any. Concise.
-- Never commit plans.
+- End a plan with the open questions, if any.
+- Never commit a plan.
 
 ## Agents
 
-Delegate implementation and research to subagents via the Task tool. Skip delegation for trivial edits (typos, single lines, imports). For cross-cutting work, run several in parallel.
+Give implementation and research to subagents. Do trivial edits yourself. Run independent work in parallel. Choose the agent from its description. Where a project defines its own agents, use those.
 
-**By language / file type**
+## Actions outside this machine
 
-| Pattern                  | Agent             |
-| ------------------------ | ----------------- |
-| `*.go`                   | golang-expert     |
-| `*.tsx` / `*.jsx`, React | react-expert      |
-| `*.ts` (non-React)       | typescript-expert |
-| `*.py`                   | python-expert     |
+These rules apply in every repository.
 
-**By role**
-
-| Work                                          | Agent            |
-| --------------------------------------------- | ---------------- |
-| Backend — server, DB, auth, middleware        | backend-expert   |
-| Frontend — HTML/CSS, browser-side             | frontend-expert  |
-| Mixed front + back                            | fullstack-expert |
-| UI/UX — styling, layout, design systems       | ui-expert        |
-| Security review — input, auth, secrets, OWASP | security-expert  |
-| Docs — keep docs in sync with code            | docs-expert      |
-
-**Research (read-only — use freely before editing)**
-
-| Need                       | Agent                    |
-| -------------------------- | ------------------------ |
-| Where does X live?         | codebase-locator-expert  |
-| How does X work?           | codebase-analyzer-expert |
-| Existing pattern to copy?  | codebase-pattern-expert  |
-| Current web / library info | research-expert          |
-
-Role agents win when the task is role-scoped (API, security, UI) even across languages; language agents for single-language implementation.
+- **Merge, mark ready and request reviewers are mine alone**, in every repository.
+- **Other outside writes need my permission.** This covers `gh pr` and `gh issue` writes, `gh api` mutations, pushes and comments. Permission is my words that name the action, or a workflow I started whose definition includes it. The scope is exactly what the words or the workflow name. If the scope is unclear, show me the content and ask before you send it.
