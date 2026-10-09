@@ -5,33 +5,33 @@ agent_command: claude
 projects:
   - name: livedocument
     directory: /Users/nednella/code/upscope/livedocument
-    session_branch_fallback: "issue-{n}"
-    session_cleanup_command: "upscope worktree remove {branch} && git branch -D {branch}"
-    session_cleanup_mode:
-      merge: auto
-      close: auto
-    pr_review_command: "address the review on PR #{n}: fix what it asks and push; never merge, mark ready or request reviewers"
     pr_checks_command: "fix the failing checks on PR #{n} and push; never merge, mark ready or request reviewers"
+    pr_conflict_command: "PR #{n} conflicts with master: rebase onto origin/master, never merge master in; resolve the conflicts, run the tests and push with --force-with-lease; never merge, mark ready or request reviewers"
+    pr_review_command: "address the review on PR #{n}: fix what it asks, resolve the threads you fixed and push; never merge, mark ready or request reviewers"
     queue_sections:
       - name: Ready
         labels: [ready]
+        draggable_from: []
         actions:
-          - {name: Work, command: "/work {n}"}
-      - name: Needs plan
-        labels: [needs-plan]
-        actions:
-          - {name: Investigate, command: "/investigate {n}", model: opus}
+          - { name: Work, command: "/work {n}" }
       - name: Needs you
         labels: [needs-human]
+        draggable_from: []
         actions:
-          - {name: Open, command: ""}
+          - { name: Work with me, command: "/work {n} manual" }
       - name: Ideas
-        labels: [idea, roadmap, "type:bug", "type:chore", "type:feature", "type:refactor"]
+        labels: [idea]
         actions:
-          - {name: Open, command: ""}
-      - name: Inbox
+          - { name: Open }
+      - name: Roadmap
+        labels: [roadmap]
         actions:
-          - {name: Investigate, command: "/investigate {n}"}
+          - { name: Plan, command: "/plan {n}", model: fable, effort: high }
+    session_branch_fallback: issue-{n}
+    session_cleanup_command: upscope worktree remove {branch}; git branch -D {branch}
+    session_cleanup_mode:
+      close: auto
+      merge: auto
   - name: agentos
     directory: /Users/nednella/code/agentos
     pr_checks_command: "fix the failing checks on PR #{n} and push; never merge, mark ready or request reviewers"
