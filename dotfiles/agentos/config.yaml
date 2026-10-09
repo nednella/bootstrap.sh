@@ -47,3 +47,18 @@ projects:
     session_cleanup_mode:
       close: auto
       merge: auto
+  - name: sanity
+    directory: /Users/nednella/code/sanity
+    pr_checks_command: "fix the failing checks on PR #{n} and push; never merge, mark ready or request reviewers"
+    pr_conflict_command: "PR #{n} conflicts with main: rebase onto origin/main, never merge main in; resolve the conflicts, run the tests and push with --force-with-lease; never merge, mark ready or request reviewers"
+    pr_review_command: "address the review on PR #{n}: fix what it asks and push; never merge, mark ready or request reviewers"
+    queue_sections:
+      - name: Inbox
+        labels: ["*"]
+        actions:
+          - { name: Work, command: "/work {n}" }
+    session_branch_fallback: issue-{n}
+    session_cleanup_command: git worktree remove {worktree} && git branch -D {branch}
+    session_cleanup_mode:
+      close: auto
+      merge: auto
