@@ -8,6 +8,6 @@ read_command "$reason"
 
 [[ $command =~ ^[[:space:]]*gh[[:space:]]+pr[[:space:]]+merge[[:space:]]+--help[[:space:]]*$ ]] && exit 0
 [[ $command =~ $GH && $command =~ (^|[^[:alnum:]_-])pr[[:space:]]+merge([^[:alnum:]_-]|$) ]] && deny "$reason"
-[[ $command =~ /pulls/[0-9]+/merge ]] && deny "$reason"
-[[ $command =~ mergePullRequest|enablePullRequestAutoMerge|enqueuePullRequest ]] && deny "$reason"
+[[ $text =~ /pulls/[0-9]+/merge ]] && deny "$reason"
+[[ $text =~ mergePullRequest|enablePullRequestAutoMerge|enqueuePullRequest ]] && deny "$reason"
 exit 0

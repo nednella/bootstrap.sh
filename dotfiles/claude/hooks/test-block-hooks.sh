@@ -50,6 +50,25 @@ expect allow block-review-requests.sh 'gh pr create --draft --title x --body y'
 expect allow block-review-requests.sh 'gh pr edit 12 --body x'
 expect allow block-review-requests.sh 'gh pr edit 12 --remove-reviewer x'
 expect allow block-review-requests.sh 'ls -r'
+expect allow block-review-requests.sh 'gh pr create -R a/b --draft --title x --body y'
+expect deny  block-review-requests.sh 'gh pr create -R a/b --draft -r x'
+
+body='Do not run gh pr merge, gh pr ready or gh pr edit --add-reviewer x; no --reviewer, no -r x.'
+for hook in block-pr-merge.sh block-pr-ready.sh block-review-requests.sh; do
+  expect allow $hook "gh pr create -R a/b --draft --title x --body \"$body\""
+  expect allow $hook "gh pr create -R a/b --draft --title x --body '$body'"
+  expect allow $hook "gh pr create -R a/b --draft --body-file - <<'EOF'"$'\n'"$body"$'\nEOF'
+  expect allow $hook "gh pr create --draft --body \"\$(cat <<'EOF'"$'\n'"$body"$'\nEOF\n)"'
+  expect allow $hook "agentos new x --prompt - <<'EOF'"$'\n'"$body"$'\nEOF'
+  expect allow $hook "cat > /tmp/b.md <<-\"EOF\""$'\n'"$body"$'\n\tEOF'
+done
+expect deny  block-pr-merge.sh "cat > /tmp/b.md <<'EOF'"$'\nx\nEOF\ngh pr merge 1'
+expect deny  block-pr-merge.sh $'gh pr create --body-file - <<EOF\n$(gh pr merge 1)\nEOF'
+expect deny  block-pr-merge.sh 'gh pr create --body "$(gh pr merge 1)"'
+expect deny  block-pr-merge.sh $'bash <<\'EOF\'\ngh pr merge 1\nEOF'
+expect deny  block-pr-merge.sh $'/bin/sh -s <<\'EOF\'\ngh pr merge 1\nEOF'
+expect deny  block-pr-merge.sh $'gh api graphql -F query=@- <<\'EOF\'\nmutation{mergePullRequest(input:{}){clientMutationId}}\nEOF'
+expect deny  block-pr-merge.sh 'gh pr create --title x && gh pr merge 1'
 
 for hook in block-pr-merge.sh block-pr-ready.sh block-review-requests.sh; do
   output=$(echo 'not json' | ${BASH_RUNNER:-} "$hooks/$hook" 2>/dev/null)

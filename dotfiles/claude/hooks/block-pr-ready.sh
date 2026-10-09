@@ -8,5 +8,5 @@ read_command "$reason"
 
 [[ $command =~ --undo([^[:alnum:]_-]|$) ]] && exit 0
 [[ $command =~ $GH && $command =~ (^|[^[:alnum:]_-])pr[[:space:]]+ready([^[:alnum:]_-]|$) ]] && deny "$reason"
-[[ $command =~ markPullRequestReadyForReview ]] && deny "$reason"
+[[ $text =~ markPullRequestReadyForReview ]] && deny "$reason"
 exit 0

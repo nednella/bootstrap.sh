@@ -7,6 +7,7 @@ reason="Requesting reviewers is the user's alone. Tell the user the PR is ready 
 read_command "$reason"
 
 [[ $command =~ --add-reviewer|--reviewer([^[:alnum:]_-]|$) ]] && deny "$reason"
+[[ $text =~ requested_reviewers|requestReviews ]] && deny "$reason"
+shopt -u nocasematch # -R is --repo; only -r is --reviewer
 [[ $command =~ $GH && $command =~ pr[[:space:]]+create && $command =~ [[:space:]]-r([[:space:]=]|$) ]] && deny "$reason"
-[[ $command =~ requested_reviewers|requestReviews ]] && deny "$reason"
 exit 0
