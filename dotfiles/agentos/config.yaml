@@ -1,6 +1,5 @@
 data_dir: ~/Library/Mobile Documents/com~apple~CloudDocs/Documents/agentos
 keep_mac_awake: true
-app_text_scale: 0.92
 agent_command: claude
 projects:
   - name: livedocument
@@ -43,22 +42,35 @@ projects:
         actions:
           - { name: Work, command: "/work {n}" }
     session_branch_fallback: issue-{n}
-    session_cleanup_command: git worktree remove {worktree} && git branch -D {branch}
+    session_cleanup_command: "{ [ -z {worktree} ] || git worktree remove {force} {worktree}; } && git branch -D {branch}"
     session_cleanup_mode:
       close: auto
       merge: auto
   - name: sanity
     directory: /Users/nednella/code/sanity
-    pr_checks_command: "fix the failing checks on PR #{n} and push; never merge, mark ready or request reviewers"
-    pr_conflict_command: "PR #{n} conflicts with main: rebase onto origin/main, never merge main in; resolve the conflicts, run the tests and push with --force-with-lease; never merge, mark ready or request reviewers"
-    pr_review_command: "address the review on PR #{n}: fix what it asks and push; never merge, mark ready or request reviewers"
+    pr_checks_command: "PR #{n} has failing checks. Find the cause, fix it, run the tests and push. Never merge the PR, mark it ready or request reviewers."
+    pr_conflict_command: "PR #{n} conflicts with its base branch. Bring the base branch's changes into the PR's branch as this repository does it, resolve the conflicts, run the tests and push. Never merge the PR, mark it ready or request reviewers."
+    pr_review_command: "PR #{n} got a review or comment. Read it, fix what it asks, run the tests and push. Never merge the PR, mark it ready or request reviewers."
     queue_sections:
-      - name: Inbox
-        labels: ["*"]
+      - name: Web
+        labels: [web]
         actions:
           - { name: Work, command: "/work {n}" }
+      - name: Server
+        labels: [server]
+        actions:
+          - { name: Work, command: "/work {n}" }
+      - name: Bot
+        labels: [bot]
+        actions:
+          - { name: Work, command: "/work {n}" }
+      - name: Roadmap
+        labels: [roadmap]
+        actions:
+          - { name: Open }
     session_branch_fallback: issue-{n}
-    session_cleanup_command: git worktree remove {worktree} && git branch -D {branch}
+    session_cleanup_command: "{ [ -z {worktree} ] || git worktree remove {force} {worktree}; } && git branch -D {branch}"
     session_cleanup_mode:
       close: auto
       merge: auto
+app_text_scale: 0.85
