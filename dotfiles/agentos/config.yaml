@@ -13,11 +13,12 @@ projects:
         draggable_from: []
         actions:
           - { name: Work, command: "/work {n}" }
+          - { name: Work (Manual), command: "/work {n} manual" }
       - name: Needs you
         labels: [needs-human]
         draggable_from: []
         actions:
-          - { name: Work with me, command: "/work {n} manual" }
+          - { name: Work (Manual), command: "/work {n} manual" }
       - name: Ideas
         labels: [idea]
         actions:
@@ -25,7 +26,8 @@ projects:
       - name: Roadmap
         labels: [roadmap]
         actions:
-          - { name: Plan, command: "/plan {n}", model: fable, effort: high, kind: chat }
+          - { name: Plan, command: "/plan {n}", model: opus, effort: high, kind: chat }
+          - { name: Plan (Fable), command: "/plan {n}", model: fable, effort: high, kind: chat }
     session_branch_fallback: issue-{n}
     session_cleanup_command: upscope worktree remove {branch}; git branch -D {branch}
     session_cleanup_mode:
