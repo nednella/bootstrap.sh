@@ -7,6 +7,7 @@ projects:
     pr_checks_command: "fix the failing checks on PR #{n} and push; never merge, mark ready or request reviewers"
     pr_conflict_command: "PR #{n} conflicts with master: rebase onto origin/master, never merge master in; resolve the conflicts, run the tests and push with --force-with-lease; never merge, mark ready or request reviewers"
     pr_review_command: "address the review on PR #{n}: fix what it asks, resolve the threads you fixed and push; never merge, mark ready or request reviewers"
+    pr_review_drafts: false
     queue_sections:
       - name: Ready
         labels: [ready]
@@ -38,6 +39,7 @@ projects:
     pr_checks_command: "fix the failing checks on PR #{n} and push; never merge, mark ready or request reviewers"
     pr_conflict_command: "PR #{n} conflicts with main: rebase onto origin/main, never merge main in; resolve the conflicts, run the tests and push with --force-with-lease; never merge, mark ready or request reviewers"
     pr_review_command: "address the review on PR #{n}: fix what it asks and push; never merge, mark ready or request reviewers"
+    pr_review_drafts: false
     queue_sections:
       - name: Inbox
         labels: ["*"]
@@ -53,6 +55,7 @@ projects:
     pr_checks_command: "PR #{n} has failing checks. Find the cause, fix it, run the tests and push. Never merge the PR, mark it ready or request reviewers."
     pr_conflict_command: "PR #{n} conflicts with its base branch. Bring the base branch's changes into the PR's branch as this repository does it, resolve the conflicts, run the tests and push. Never merge the PR, mark it ready or request reviewers."
     pr_review_command: "PR #{n} got a review or comment. Read it, fix what it asks, run the tests and push. Never merge the PR, mark it ready or request reviewers."
+    pr_review_drafts: false
     queue_sections:
       - name: Web
         labels: [web]
