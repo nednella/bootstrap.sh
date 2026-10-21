@@ -1,26 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "model": "opus",
-  "enabledPlugins": {
-    "claude-mem@thedotmack": true,
-    "superpowers@claude-plugins-official": true
-  },
-  "extraKnownMarketplaces": {
-    "thedotmack": {
-      "source": {
-        "source": "github",
-        "repo": "thedotmack/claude-mem"
-      }
-    }
-  },
-  "effortLevel": "medium",
-  "tui": "fullscreen",
-  "totalTokensReminder": "countdown",
-  "agentPushNotifEnabled": true,
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh"
-  },
+  "cleanupPeriodDays": 90,
+  "syncClaudeAiSkills": false,
   "permissions": {
     "deny": [
       "Read(./.env)",
@@ -36,8 +17,7 @@
       "Bash(wget * | bash)"
     ]
   },
-  "cleanupPeriodDays": 90,
-  "outputStyle": "ASD-STE100",
+  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
@@ -59,5 +39,26 @@
       }
     ]
   },
-  "syncClaudeAiSkills": false
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+  "enabledPlugins": {
+    "claude-mem@thedotmack": true,
+    "superpowers@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "thedotmack": {
+      "source": {
+        "source": "github",
+        "repo": "thedotmack/claude-mem"
+      }
+    }
+  },
+  "outputStyle": "ASD-STE100",
+  "effortLevel": "medium",
+  "tui": "fullscreen",
+  "totalTokensReminder": "countdown",
+  "switchModelsOnFlag": false,
+  "agentPushNotifEnabled": true
 }
