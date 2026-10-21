@@ -1,0 +1,13 @@
+{
+  "trustedWorkspaces": ["/Users/nednella/code/agentos", "/Users/nednella/code/checkout-bot"],
+  "model": "gemini-4-argon-medium",
+  "permissions": {
+    "deny": [
+      "read_file(~/.ssh)",
+      "read_file(~/.aws)",
+      "read_file(~/.config/gh)",
+      "command(regex:curl\\b.*\\|\\s*(ba)?sh\\b)",
+      "command(regex:wget\\b.*\\|\\s*(ba)?sh\\b)"
+    ]
+  }
+}
