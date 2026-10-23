@@ -73,13 +73,31 @@ projects:
         labels: [bot]
         actions:
           - { name: Work, command: "/work {n}" }
+      - name: Plugin
+        labels: [plugin]
+        actions:
+          - { name: Work, command: "/work {n}" }
       - name: Roadmap
         labels: [roadmap]
         actions:
-          - { name: Open }
+          - { name: Work, command: "/work {n}" }
     session_branch_fallback: issue-{n}
     session_cleanup_command: "{ [ -z {worktree} ] || git worktree remove {force} {worktree}; } && git branch -D {branch}"
     session_cleanup_mode:
       close: auto
       merge: auto
-app_text_scale: 0.92
+  - name: checkout-bot
+    directory: /Users/nednella/code/checkout-bot
+    session_branch_fallback: issue-{n}
+    session_cleanup_command: "{ [ -z {worktree} ] || git worktree remove {force} {worktree}; } && git branch -D {branch}"
+    pr_review_command: "PR #{n} got a review or comment. Read it, fix what it asks, run the tests and push. Never merge the PR, mark it ready or request reviewers."
+    pr_checks_command: "PR #{n} has failing checks. Find the cause, fix it, run the tests and push. Never merge the PR, mark it ready or request reviewers."
+    pr_conflict_command: "PR #{n} conflicts with its base branch. Bring the base branch's changes into the PR's branch as this repository does it, resolve the conflicts, run the tests and push. Never merge the PR, mark it ready or request reviewers."
+    queue_sections:
+      - name: Inbox
+        labels:
+          - "*"
+        actions:
+          - name: Work
+            command: /work {n}
+app_text_scale: 0.85
