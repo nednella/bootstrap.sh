@@ -16,6 +16,9 @@ export PATH="$PATH:$UPSCOPE_DIR/bin"
 export GOPATH="$HOME/.local/share/go"
 export GOBIN="$HOME/.local/bin"
 
+# OrbStack
+source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+
 # starship
 export STARSHIP_CONFIG="$XDG_CONFIG_HOME/starship/starship.toml"
 
