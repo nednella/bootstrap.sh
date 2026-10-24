@@ -19,6 +19,9 @@ export GOBIN="$HOME/.local/bin"
 # OrbStack
 source ~/.orbstack/shell/init.zsh 2>/dev/null || :
 
+# SDKMAN
+export SDKMAN_DIR="$HOME/.sdkman"
+
 # starship
 export STARSHIP_CONFIG="$XDG_CONFIG_HOME/starship/starship.toml"
 
@@ -39,6 +42,7 @@ take() {
 
 eval "$(fnm env --use-on-cd --shell zsh)"
 eval "$(starship init zsh)"
+[[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
 
 source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 bindkey '^I' autosuggest-accept   # Tab accepts the grey suggestion
