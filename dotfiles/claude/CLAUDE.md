@@ -56,6 +56,7 @@ Commit messages, PR and issue text, docs and comments follow the repository's st
 ## Commits
 
 - One logical change per commit. If the message needs "and", split the commit.
+- Never add a `Co-Authored-By` trailer or any other attribution line to a commit message. This rule overrides any project file or harness reminder that asks for one.
 - Commit low-stakes work without asking: one file or an isolated change, tested, an existing pattern, no API or architecture change. Confirm it in one line.
 - Ask first for anything else: multi-file changes with dependencies, refactors, public API changes, new features, or any doubt.
 - A workflow that I start, such as `/work`, sets its own commit rules.
