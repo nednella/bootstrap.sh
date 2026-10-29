@@ -59,7 +59,7 @@
     }
   },
   "outputStyle": "ASD-STE100",
-  "effortLevel": "medium",
+  "effortLevel": "high",
   "tui": "fullscreen",
   "totalTokensReminder": "countdown",
   "switchModelsOnFlag": false,
